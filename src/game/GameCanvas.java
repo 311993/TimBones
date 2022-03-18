@@ -73,9 +73,9 @@ public class GameCanvas extends Canvas {
 	    
 	    try{
 	    	timBones = ImageIO.read(new File("src\\assets\\timBonesHat.png"));
-	    	test = ImageIO.read(new File("src\\assets\\dirt8x8.png"));
+	    	test = ImageIO.read(new File("src\\assets\\gray.png"));
 	    	testLevelImg = ImageIO.read(new File("src\\data\\testLevel.png"));
-	    	block = ImageIO.read(new File("src\\assets\\test.png"));
+	    	block = ImageIO.read(new File("src\\assets\\graybrick8x8.png"));
 	    }catch(IOException e){
 	    	e.printStackTrace();
 	    }
@@ -128,8 +128,6 @@ public class GameCanvas extends Canvas {
 		
 		g.drawImage(timBones, (int)p.x + screenX, (int)p.y - 8, null);
 		
-		p.update();
-		
 		if(WIDTH/SIM_WIDTH > HEIGHT/SIM_HEIGHT){
     		ratio = (int)Math.floor(HEIGHT/SIM_HEIGHT);
     	}else{
@@ -143,6 +141,8 @@ public class GameCanvas extends Canvas {
 		
 		window.setColor(Color.WHITE);
 		window.drawRect((WIDTH - SIM_WIDTH*ratio)/2, (HEIGHT - SIM_HEIGHT*ratio)/2, SIM_WIDTH*ratio, SIM_HEIGHT*ratio);
+		
+		p.update();
 	}
 	
 	private void collisionBox(int x, int y,int w, int h, BufferedImage img){
