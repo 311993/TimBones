@@ -17,11 +17,12 @@ public class Player {
     
     double previousX = 200;
     double previousY = 200;
-   
     
-    int jumps =  1;
+    double terminalVelocity  = 12;
+    
+    int jumps =  2;
     boolean jumpPrevious = false;
-    int jumpsMax =  1;
+    int jumpsMax =  2;
     boolean jumpKeyLast = false;
 
     private Keys keys;
@@ -58,6 +59,10 @@ public class Player {
         previousX = x;
         previousY = y;
         jumpKeyLast = keys.getValue(38);
+        
+        if(Math.abs(v_y) > terminalVelocity){
+        	v_y = Math.signum(v_y)*terminalVelocity;
+        }
         
         x += v_x;
         y += v_y;

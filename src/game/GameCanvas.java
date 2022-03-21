@@ -73,8 +73,8 @@ public class GameCanvas extends Canvas {
 	    
 	    try{
 	    	timBones = ImageIO.read(new File("src\\assets\\timBonesHat.png"));
-	    	test = ImageIO.read(new File("src\\assets\\gray.png"));
-	    	testLevelImg = ImageIO.read(new File("src\\data\\testLevel.png"));
+	    	test = ImageIO.read(new File("src\\assets\\black.png"));
+	    	testLevelImg = ImageIO.read(new File("src\\data\\testLevel3.png"));
 	    	block = ImageIO.read(new File("src\\assets\\graybrick8x8.png"));
 	    }catch(IOException e){
 	    	e.printStackTrace();
@@ -88,8 +88,8 @@ public class GameCanvas extends Canvas {
    		}   		
    		
    		try {
-   			util.DatManager.imageToDat(testLevelImg, new File("src\\data\\level1.dat"));
-			testLevel = util.DatManager.datToArray(new File("src\\data\\level1.dat"));
+   			//util.DatManager.imageToDat(testLevelImg, new File("src\\data\\level4.dat"));
+			testLevel = util.DatManager.datToArray(new File("src\\data\\level2.dat"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -105,28 +105,29 @@ public class GameCanvas extends Canvas {
 	
 	public void paint(Graphics window) {
 		
-		int drawMinX = (int) p.x / 8  - 16;
-		if(drawMinX < 0){ drawMinX = 0;}
-		if(drawMinX > testLevel[0].length -33){drawMinX = testLevel[0].length -33;};
+		int drawMaxX = screenX/-8 + 32;
+			if(drawMaxX > testLevel[0].length - 1){drawMaxX = testLevel[0].length - 1;}
 		
-		int drawMaxX = 16 + (int) p.x / 8;
-		if(drawMaxX > testLevel[0].length - 1){drawMaxX = testLevel[0].length - 1;}
-		if(drawMaxX < 32){drawMaxX = 32;}
-		
-		for(int j = 0; j < testLevel.length; j++) {
-			for(int i =  drawMinX; i <= drawMaxX; i++) {
+		int drawMaxY = screenY/-8 + 22;
+			if(drawMaxY > testLevel.length - 1){drawMaxY = testLevel.length - 1;}
+				
+		for(int j = screenY/-8; j <= drawMaxY; j++) {
+			for(int i =  screenX/-8; i <= drawMaxX; i++) {
 				switch(testLevel[j][i]){ 
 					case 1:
-						collisionBox(i*8, 64+j*8, 8, 8, block);
+						collisionBox(i*8, 64 + j*8, 8, 8, block);
 					break;
 					default:
-						g.drawImage(test, i*8 + screenX, 64+j*8, null);
+						g.drawImage(test, i*8 + screenX, 64 + j*8 + screenY, null);
 					break;
 				}
 			}
 		}
 		
-		g.drawImage(timBones, (int)p.x + screenX, (int)p.y - 8, null);
+		g.setColor(Color.BLACK);
+		g.fillRect(0,56,256,8);
+		
+		g.drawImage(timBones, (int)p.x + screenX, (int)p.y - 8 + screenY, null);		
 		
 		if(WIDTH/SIM_WIDTH > HEIGHT/SIM_HEIGHT){
     		ratio = (int)Math.floor(HEIGHT/SIM_HEIGHT);
@@ -134,8 +135,25 @@ public class GameCanvas extends Canvas {
     		ratio = (int)Math.floor(WIDTH/SIM_WIDTH);
     	}	
 		
-		if((int)p.x > 127 && (int)p.x < (roomWidth*8 - 127))
-		screenX = -(SIM_WIDTH*3)/2 + roomWidth*8 - (int)p.x;
+		screenX = -8 + 128 - (int)p.x;
+		
+		if(screenX > 0 ){
+			screenX = 0;
+		}
+		
+		if(screenX < (roomWidth)*-8 + 256){
+			screenX = (roomWidth)*-8 + 256;
+		}
+		
+		screenY =  64 - 8 + 88 - (int)p.y;
+		
+		if(screenY > 0){
+			screenY = 0;
+		}
+		
+		if(screenY < (roomHeight)*-8 + 176){
+			screenY = (roomHeight)*-8 + 176;
+		}
 		
 		window.drawImage(buffer,(WIDTH - SIM_WIDTH*ratio)/2, (HEIGHT - SIM_HEIGHT*ratio)/2, SIM_WIDTH*ratio, SIM_HEIGHT*ratio, null);
 		
@@ -182,6 +200,6 @@ public class GameCanvas extends Canvas {
 	        
 	    }
 	    
-	    g.drawImage(img, x + screenX,y,w,h,null);
+	    g.drawImage(img, x + screenX, y + screenY,w,h,null);
 	}
 }
