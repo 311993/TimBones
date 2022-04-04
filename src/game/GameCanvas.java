@@ -33,7 +33,27 @@ public class GameCanvas extends Canvas {
 			{"004767", "007FA7", "00BFE7", "87E7F7"},
 			{"000000", "171717", "474747", "8F8F8F"},
 		};
-	private static int[][] testLevel;
+	
+	private static final String[][] roomMap = {
+			{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+			{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+			{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+			{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+			{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+			{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+			{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+			{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+			{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+			{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+			{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+			{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+			{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+			{"00","06","07","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+			{"03","01","01","02","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+			{"00","04","05","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+	};
+	
+	private static int[][] currentLevel;
 	
 	private static final Color[][] fullPalette = new Color[paletteHexReference.length][paletteHexReference[0].length];
 	
@@ -50,12 +70,14 @@ public class GameCanvas extends Canvas {
 	
 	private int ratio;
 	
-	private BufferedImage timBones,test, testLevelImg, block;
+	private BufferedImage timBones,test, currentLevelImg, block;
 
 	private Player p;
 	
 	private int screenX, screenY = 0;
 	private int roomWidth = 32,roomHeight = 22; 
+	
+	private int segX, segY;
 	
 	public GameCanvas(int w, int h) {
 		WIDTH = w;
@@ -74,7 +96,7 @@ public class GameCanvas extends Canvas {
 	    try{
 	    	timBones = ImageIO.read(new File("src\\assets\\timBonesHat.png"));
 	    	test = ImageIO.read(new File("src\\assets\\black.png"));
-	    	testLevelImg = ImageIO.read(new File("src\\data\\testLevel3.png"));
+	    	//currentLevelImg = ImageIO.read(new File("src\\data\\testLevel3.png"));
 	    	block = ImageIO.read(new File("src\\assets\\graybrick8x8.png"));
 	    }catch(IOException e){
 	    	e.printStackTrace();
@@ -88,15 +110,15 @@ public class GameCanvas extends Canvas {
    		}   		
    		
    		try {
-   			//util.DatManager.imageToDat(testLevelImg, new File("src\\data\\level4.dat"));
-			testLevel = util.DatManager.datToArray(new File("src\\data\\level2.dat"));
+   			//util.DatManager.imageToDat(currentLevelImg, new File("src\\data\\level5.dat"));
+			currentLevel = util.DatManager.datToArray(new File("src\\data\\level2.dat"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
    		
-   		roomWidth = testLevel[0].length;
-   		roomHeight = testLevel.length;
+   		roomWidth = currentLevel[0].length;
+   		roomHeight = currentLevel.length;
 	}
 
 	public GameCanvas(GraphicsConfiguration config) {
@@ -106,14 +128,14 @@ public class GameCanvas extends Canvas {
 	public void paint(Graphics window) {
 		
 		int drawMaxX = screenX/-8 + 32;
-			if(drawMaxX > testLevel[0].length - 1){drawMaxX = testLevel[0].length - 1;}
+			if(drawMaxX > currentLevel[0].length - 1){drawMaxX = currentLevel[0].length - 1;}
 		
 		int drawMaxY = screenY/-8 + 22;
-			if(drawMaxY > testLevel.length - 1){drawMaxY = testLevel.length - 1;}
+			if(drawMaxY > currentLevel.length - 1){drawMaxY = currentLevel.length - 1;}
 				
 		for(int j = screenY/-8; j <= drawMaxY; j++) {
 			for(int i =  screenX/-8; i <= drawMaxX; i++) {
-				switch(testLevel[j][i]){ 
+				switch(currentLevel[j][i]){ 
 					case 1:
 						collisionBox(i*8, 64 + j*8, 8, 8, block);
 					break;
@@ -154,6 +176,15 @@ public class GameCanvas extends Canvas {
 		if(screenY < (roomHeight)*-8 + 176){
 			screenY = (roomHeight)*-8 + 176;
 		}
+		
+		segX = (int)p.x/256;
+		segY = (int)p.y/256;
+		
+		window.setColor(Color.BLACK);
+		window.fillRect(0,0,200,200);
+		
+		window.setColor(Color.WHITE);
+		window.drawString(segX +", " + segY, 20,20);
 		
 		window.drawImage(buffer,(WIDTH - SIM_WIDTH*ratio)/2, (HEIGHT - SIM_HEIGHT*ratio)/2, SIM_WIDTH*ratio, SIM_HEIGHT*ratio, null);
 		
