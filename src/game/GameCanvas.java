@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
@@ -124,6 +125,8 @@ public class GameCanvas extends Canvas {
    		
    		roomWidth = currentLevel[0].length;
    		roomHeight = currentLevel.length;
+   		
+   		parseRooms(roomMap);
 	}
 
 	public GameCanvas(GraphicsConfiguration config) {
@@ -199,12 +202,49 @@ public class GameCanvas extends Canvas {
 		p.update();
 	}
 	
+	
+	/** Constructs rectangular rooms from a hexadecimal matrix
+	 * 		@param roomMap - a 2D array of two-digit hexadecimal Strings
+	 *  	@return an ArrayList of size 256 of rectangular Rooms
+	 *  	@throws FileNotFoundException when the room data file associated with a room present in roomMap does not exist
+	 *  	@throws NumberFormatException when roomMap contains Strings that are not valid two-digit hexadecimal numbers 
+	 **/
 	private ArrayList<Room> parseRooms(String[][] roomMap){
 		ArrayList<Room> output  = new ArrayList<Room>();
 		
+		while(output.size() < 255){ output.add(null); }
+		
 		for(int y = 0; y < roomMap.length; y++) {
-			for(int x = 0; x < roomMap.length; x++) {
+			for(int x = 0; x < roomMap[y].length; x++) {
 				
+				String id = roomMap[y][x];
+					
+				if(id.length() <= 2 && !id.equals("00") && Objects.isNull( output.get(Integer.parseInt(id, 16)) ) ){
+					
+					int w = 1,h = 1,xStart = x, yStart = y;
+					
+					while(x + 1 < roomMap[y].length && roomMap[y][x+1].equals(id)){
+						w++;
+						x++;
+					}
+					
+					while(y + 1 < roomMap.length && roomMap[y+1][x].equals(id)){
+						h++;
+						y++;
+					}
+				
+					try {
+						output.set(Integer.parseInt(id, 16), new Room(xStart, yStart, w, h, "null", 1));
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					}
+				
+					y = yStart;
+					
+				
+				}
 			}
 		}
 		
