@@ -35,7 +35,7 @@ public class GameFrame extends JFrame implements ActionListener {
     }
     
     public void draw(){
-    	Timer timer = new Timer(20, this);
+    	Timer timer = new Timer(1000/60, this);
     	timer.setRepeats(true);
     	timer.start();
     }
