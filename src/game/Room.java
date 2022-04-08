@@ -24,10 +24,34 @@ public class Room{
 	}
 	
 	public Room(int x, int y, int width, int height, int levelNum) throws FileNotFoundException {
-		this(x, y, width, height, "", levelNum);
+		this(x, y, width, height, " "+levelNum, levelNum);
 	}
 	
 	public String toString(){
-		return width + " x " + height + " room at " + x + ", " + y;
+		return "Room " + name + " :: "+ width + " x " + height + " room at (" + x + ", " + y + ")";
 	}
+	
+	int[][] getData(){
+		return data;
+	}
+	
+	int getX(){
+		return x;
+	};
+	
+	int getY(){
+		return y;
+	};
+	
+	int getWidth(){
+		return width;
+	};
+	
+	int getHeight(){
+		return height;
+	};
+	
+	String getName(){
+		return name;
+	};
 }

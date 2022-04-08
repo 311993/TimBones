@@ -2,7 +2,7 @@ package game;
 
 public class Player {
 
-	double x = 200;
+	double x = 16;
     double y = 96;
     
     double v_x = 0;
@@ -22,7 +22,7 @@ public class Player {
     
     int jumps =  2;
     boolean jumpPrevious = false;
-    int jumpsMax =  2;
+    int jumpsMax =  999999;
     boolean jumpKeyLast = false;
 
     private Keys keys;

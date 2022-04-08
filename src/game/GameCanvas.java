@@ -59,7 +59,8 @@ public class GameCanvas extends Canvas {
 		{"03","01","01","02","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
 		{"00","04","05","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},*/
 	
-	private static int[][] currentLevel;
+	private static Room currentRoom;
+	private static ArrayList<Room> roomList;
 	
 	private static final Color[][] fullPalette = new Color[paletteHexReference.length][paletteHexReference[0].length];
 	
@@ -102,8 +103,19 @@ public class GameCanvas extends Canvas {
 	    try{
 	    	timBones = ImageIO.read(new File("src\\assets\\timBonesHat.png"));
 	    	test = ImageIO.read(new File("src\\assets\\black.png"));
-	    	//currentLevelImg = ImageIO.read(new File("src\\data\\testLevel3.png"));
 	    	block = ImageIO.read(new File("src\\assets\\graybrick8x8.png"));
+	    	
+	    	//currentLevelImg = ImageIO.read(new File("src\\data\\testLevel1.png"));
+	    	
+	    	//import room data from PNGs
+	    	/*for(int i = 1; i < 10; i++){
+	    		util.DatManager.imageToDat(ImageIO.read(new File("src\\data\\testLevel" + i +".png")), new File("src\\data\\level" + i +".dat"));
+	    	}*/
+	    	
+	    	roomList = parseRooms(roomMap);
+	    	
+	    	currentRoom = roomList.get(1);
+	    	
 	    }catch(IOException e){
 	    	e.printStackTrace();
 	    }
@@ -115,18 +127,16 @@ public class GameCanvas extends Canvas {
    			}
    		}   		
    		
-   		try {
-   			//util.DatManager.imageToDat(currentLevelImg, new File("src\\data\\level5.dat"));
-			currentLevel = util.DatManager.datToArray(new File("src\\data\\level2.dat"));
+   		/*try {
+   			//util.DatManager.imageToDat(currentLevelImg, new File("src\\data\\level1.dat"));
+			//currentLevel = util.DatManager.datToArray(new File("src\\data\\level1.dat"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
    		
-   		roomWidth = currentLevel[0].length;
-   		roomHeight = currentLevel.length;
-   		
-   		parseRooms(roomMap);
+   		roomWidth = currentRoom.getData()[0].length;
+   		roomHeight = currentRoom.getData().length;
 	}
 
 	public GameCanvas(GraphicsConfiguration config) {
@@ -135,15 +145,16 @@ public class GameCanvas extends Canvas {
 	
 	public void paint(Graphics window) {
 		
+	//Draw Tiles
 		int drawMaxX = screenX/-8 + 32;
-			if(drawMaxX > currentLevel[0].length - 1){drawMaxX = currentLevel[0].length - 1;}
+			if(drawMaxX > currentRoom.getData()[0].length - 1){drawMaxX = currentRoom.getData()[0].length - 1;}
 		
 		int drawMaxY = screenY/-8 + 22;
-			if(drawMaxY > currentLevel.length - 1){drawMaxY = currentLevel.length - 1;}
+			if(drawMaxY > currentRoom.getData().length - 1){drawMaxY = currentRoom.getData().length - 1;}
 				
 		for(int j = screenY/-8; j <= drawMaxY; j++) {
 			for(int i =  screenX/-8; i <= drawMaxX; i++) {
-				switch(currentLevel[j][i]){ 
+				switch(currentRoom.getData()[j][i]){ 
 					case 1:
 						collisionBox(i*8, 64 + j*8, 8, 8, block);
 					break;
@@ -154,17 +165,19 @@ public class GameCanvas extends Canvas {
 			}
 		}
 		
+	//Draw player
+		g.drawImage(timBones, (int)p.x + screenX, (int)p.y - 8 + screenY, null);	
+		
+	//Clear Menu Area
 		g.setColor(Color.BLACK);
-		g.fillRect(0,56,256,8);
+		g.fillRect(0,0,256,64);
 		
-		g.drawImage(timBones, (int)p.x + screenX, (int)p.y - 8 + screenY, null);		
+	//Check Doors
+		if(p.x >= roomWidth*8 || p.x <= -16 || p.y >= roomHeight*8 + 64|| p.y <= 64 - 16 ){
+			switchRooms();
+		}
 		
-		if(WIDTH/SIM_WIDTH > HEIGHT/SIM_HEIGHT){
-    		ratio = (int)Math.floor(HEIGHT/SIM_HEIGHT);
-    	}else{
-    		ratio = (int)Math.floor(WIDTH/SIM_WIDTH);
-    	}	
-		
+	//Calculate Screen Scrolling
 		screenX = -8 + 128 - (int)p.x;
 		
 		if(screenX > 0 ){
@@ -185,6 +198,7 @@ public class GameCanvas extends Canvas {
 			screenY = (roomHeight)*-8 + 176;
 		}
 		
+	//Determine which section of the current room the player is in
 		segX = (int)p.x/256;
 		segY = (int)p.y/256;
 		
@@ -194,12 +208,21 @@ public class GameCanvas extends Canvas {
 		window.setColor(Color.WHITE);
 		window.drawString(segX +", " + segY, 20,20);
 		
+	//Draw Simulation Onto Canvas
+		if(WIDTH/SIM_WIDTH > HEIGHT/SIM_HEIGHT){
+    		ratio = (int)Math.floor(HEIGHT/SIM_HEIGHT);
+    	}else{
+    		ratio = (int)Math.floor(WIDTH/SIM_WIDTH);
+    	}
+		
 		window.drawImage(buffer,(WIDTH - SIM_WIDTH*ratio)/2, (HEIGHT - SIM_HEIGHT*ratio)/2, SIM_WIDTH*ratio, SIM_HEIGHT*ratio, null);
 		
 		window.setColor(Color.WHITE);
 		window.drawRect((WIDTH - SIM_WIDTH*ratio)/2, (HEIGHT - SIM_HEIGHT*ratio)/2, SIM_WIDTH*ratio, SIM_HEIGHT*ratio);
 		
+	//Update player movement
 		p.update();
+		
 	}
 	
 	
@@ -234,7 +257,7 @@ public class GameCanvas extends Canvas {
 					}
 				
 					try {
-						output.set(Integer.parseInt(id, 16), new Room(xStart, yStart, w, h, "null", 1));
+						output.set(Integer.parseInt(id, 16), new Room(xStart, yStart, w, h, Integer.parseInt(id, 16)));
 					} catch (NumberFormatException e) {
 						e.printStackTrace();
 					} catch (FileNotFoundException e) {
@@ -250,6 +273,70 @@ public class GameCanvas extends Canvas {
 		
 		return output;
 	};
+	
+	private void switchRooms(){
+		
+		int oldRoomWidth = roomWidth, oldRoomHeight = roomHeight;
+
+   		if(p.x <= -16){
+   			
+   			int y = currentRoom.getY() + segY;
+   			p.y -= 22*8*segY;
+   			
+   			currentRoom = roomList.get(Integer.parseInt(roomMap[currentRoom.getY() + segY][currentRoom.getX() -1], 16));
+   			
+   			roomWidth = currentRoom.getData()[0].length;
+   	   		roomHeight = currentRoom.getData().length;
+   			
+   	   		p.x = roomWidth*8 - 17;
+   	   		p.y += 22*8*(y - currentRoom.getY());
+   		
+   	
+   	   		
+   		}else if(p.x >= oldRoomWidth*8){
+   		   	
+   			int y = currentRoom.getY() + segY;
+   			p.y -= 22*8*segY;
+   			
+   			currentRoom = roomList.get(Integer.parseInt(roomMap[currentRoom.getY() + segY][currentRoom.getX() + currentRoom.getWidth()], 16));
+   			
+   			roomWidth = currentRoom.getData()[0].length;
+   	   		roomHeight = currentRoom.getData().length;
+   			
+   			p.x = 1;
+   	   		p.y += 22*8*(y - currentRoom.getY());
+
+   	   		
+   	   		
+		} 
+   		
+   		else if(p.y <=  64 - 16){
+   			
+   			int x = currentRoom.getX() + segX;
+   			p.x -= 32*8*segX;
+   			
+   			currentRoom = roomList.get(Integer.parseInt(roomMap[currentRoom.getY() - 1][currentRoom.getX() + segX], 16));
+   			
+   			roomWidth = currentRoom.getData()[0].length;
+   	   		roomHeight = currentRoom.getData().length;
+   			
+			p.y = roomHeight*8 + 64 - 17;
+			p.x += 32*8*(x - currentRoom.getX());
+			
+   		}else if(p.y >= oldRoomHeight*8 + 64){
+			
+   			int x = currentRoom.getX() + segX;
+   			p.x -= 32*8*segX;
+   			
+   			currentRoom = roomList.get(Integer.parseInt(roomMap[currentRoom.getY() + currentRoom.getHeight()][currentRoom.getX() + segX], 16));
+   			
+   			roomWidth = currentRoom.getData()[0].length;
+   	   		roomHeight = currentRoom.getData().length;
+   			
+   			p.y = 65;
+   			p.x += 32*8*(x - currentRoom.getX());
+		}
+	}
 	
 	private void collisionBox(int x, int y,int w, int h, BufferedImage img){
 		if(p.x + p.w > x && p.x < x + w && p.y + p.h > y && p.y < y + h){
@@ -284,6 +371,8 @@ public class GameCanvas extends Canvas {
 	            }else{
 	                p.x = x + w;
 	            }
+	            
+	            System.out.println("ah");
 	        }
 	        
 	    }
