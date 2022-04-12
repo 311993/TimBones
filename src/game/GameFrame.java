@@ -10,12 +10,10 @@ import java.util.Arrays;
 import javax.swing.JFrame;
 import javax.swing.Timer;
 
-public class GameFrame extends JFrame implements ActionListener {
+public class GameFrame extends JFrame{
 	public static final int WIDTH = (int)Toolkit.getDefaultToolkit().getScreenSize().getWidth();
 	public static final int HEIGHT = (int)Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 	public static GameCanvas canvas;
-	
-	public static boolean lastEsc;
      
     public GameFrame() {
     	super("Tim Bones");
@@ -38,21 +36,7 @@ public class GameFrame extends JFrame implements ActionListener {
     }
     
     public void draw(){
-    	Timer timer = new Timer(1000/60, this);
-    	timer.setRepeats(true);
-    	timer.start();
-    }
 
-	@Override
-	public void actionPerformed(ActionEvent e) {	
-		
-		/*if(!Keys.getValue(27) && lastEsc){
-			setUndecorated(!isUndecorated());
-		}
-		
-		lastEsc = Keys.getValue(27);
-		*/
 		canvas.paint(canvas.getGraphics());
-		
-	}
+    }
 }

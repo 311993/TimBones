@@ -112,9 +112,11 @@ public class GameCanvas extends Canvas {
 	    		util.DatManager.imageToDat(ImageIO.read(new File("src\\data\\testLevel" + i +".png")), new File("src\\data\\level" + i +".dat"));
 	    	}*/
 	    	
-	    	roomList = parseRooms(roomMap);
+	    	//roomList = parseRooms(roomMap);
+	    	roomList = new ArrayList<Room>();
 	    	
-	    	currentRoom = roomList.get(1);
+	    	roomList.add(new Room(0, 0, 2, 1, 1));
+	    	currentRoom = roomList.get(0);
 	    	
 	    }catch(IOException e){
 	    	e.printStackTrace();
