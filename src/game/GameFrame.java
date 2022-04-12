@@ -14,6 +14,8 @@ public class GameFrame extends JFrame implements ActionListener {
 	public static final int WIDTH = (int)Toolkit.getDefaultToolkit().getScreenSize().getWidth();
 	public static final int HEIGHT = (int)Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 	public static GameCanvas canvas;
+	
+	public static boolean lastEsc;
      
     public GameFrame() {
     	super("Tim Bones");
@@ -32,6 +34,7 @@ public class GameFrame extends JFrame implements ActionListener {
 		setVisible(true);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		lastEsc = false;
     }
     
     public void draw(){
@@ -43,6 +46,12 @@ public class GameFrame extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {	
 		
+		/*if(!Keys.getValue(27) && lastEsc){
+			setUndecorated(!isUndecorated());
+		}
+		
+		lastEsc = Keys.getValue(27);
+		*/
 		canvas.paint(canvas.getGraphics());
 		
 	}
