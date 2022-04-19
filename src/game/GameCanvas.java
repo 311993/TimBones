@@ -200,7 +200,7 @@ public class GameCanvas extends Canvas {
 		window.fillRect(0,0,200,200);
 		
 		window.setColor(Color.WHITE);
-		window.drawString(segX +", " + segY, 20,20);
+		window.drawString(String.format("" + 1000/Main.deltaMillis), 20,20);
 		
 	//Draw Simulation Onto Canvas
 		if(WIDTH/SIM_WIDTH > HEIGHT/SIM_HEIGHT){

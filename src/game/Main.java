@@ -12,11 +12,15 @@ public class Main  implements ActionListener {
 	public GameFrame frame;
 	private static Main main;    
 	private static boolean lastEsc;
+	public static double deltaMillis;
+	public static double lastMillis;
+	
     /**
      * Creates a new instance of <code>ProjectileMain</code>.
      */
     public Main() {
     	frame = new GameFrame(true);
+    	frame.focus();
     }
     
     /**
@@ -36,6 +40,9 @@ public class Main  implements ActionListener {
     @Override
 	public void actionPerformed(ActionEvent e) {	
 		
+    	deltaMillis = System.currentTimeMillis() - lastMillis;
+    	lastMillis += deltaMillis;
+    	
 		if(!Keys.getValue(27) && lastEsc){
 			frame.dispose();
 			frame = new GameFrame(!frame.isUndecorated());

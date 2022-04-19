@@ -49,6 +49,10 @@ public class GameFrame extends JFrame{
 		
 		canvas.requestFocus();
 	}
+    
+    public void focus(){
+    	canvas.requestFocus();
+    }
 
 	public void draw(){
 
