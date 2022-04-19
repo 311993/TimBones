@@ -16,7 +16,7 @@ public class Main  implements ActionListener {
      * Creates a new instance of <code>ProjectileMain</code>.
      */
     public Main() {
-    	frame = new GameFrame();
+    	frame = new GameFrame(true);
     }
     
     /**
@@ -37,7 +37,8 @@ public class Main  implements ActionListener {
 	public void actionPerformed(ActionEvent e) {	
 		
 		if(!Keys.getValue(27) && lastEsc){
-			frame.setUndecorated(!frame.isUndecorated());
+			frame.dispose();
+			frame = new GameFrame(!frame.isUndecorated());
 		}
 		
 		lastEsc = Keys.getValue(27);

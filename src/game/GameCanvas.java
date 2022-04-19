@@ -98,7 +98,7 @@ public class GameCanvas extends Canvas {
 	    
 	    buffer = new BufferedImage(SIM_WIDTH,SIM_HEIGHT,BufferedImage.TYPE_4BYTE_ABGR);
    		g = buffer.getGraphics();
-   		requestFocusInWindow();
+   		requestFocus();
 	    
 	    try{
 	    	timBones = ImageIO.read(new File("src\\assets\\timBonesHat.png"));
