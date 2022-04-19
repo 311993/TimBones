@@ -172,11 +172,6 @@ public class GameCanvas extends Canvas {
 		g.setColor(Color.BLACK);
 		g.fillRect(0,0,256,64);
 		
-	//Check Doors
-		if(p.x >= roomWidth*8 || p.x <= -16 || p.y >= roomHeight*8 + 64|| p.y <= 64 - 16 ){
-			switchRooms();
-		}
-		
 	//Calculate Screen Scrolling
 		screenX = -8 + 128 - (int)p.x;
 		
@@ -222,6 +217,10 @@ public class GameCanvas extends Canvas {
 		
 	//Update player movement
 		p.update();
+	//Check Doors
+		if(p.x >= roomWidth*8 || p.x <= -16 || p.y >= roomHeight*8 + 64|| p.y <= 64 - 16 ){
+			switchRooms();
+		}
 		
 	}
 	
@@ -303,7 +302,7 @@ public class GameCanvas extends Canvas {
    			roomWidth = currentRoom.getData()[0].length;
    	   		roomHeight = currentRoom.getData().length;
    			
-   			p.x = 1;
+   			p.x = 0;
    	   		p.y += 22*8*(y - currentRoom.getY());
 
    	   		
@@ -372,7 +371,7 @@ public class GameCanvas extends Canvas {
 	                p.x = x + w;
 	            }
 	            
-	            System.out.println("ah");
+	            //System.out.println("ah");
 	        }
 	        
 	    }
