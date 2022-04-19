@@ -1,16 +1,22 @@
 package game;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Arrays;
 
-public class Main {
+import javax.swing.Timer;
+
+public class Main  implements ActionListener {
 	
-	public GameFrame frame;    
+	public GameFrame frame;
+	private static Main main;    
+	private static boolean lastEsc;
     /**
      * Creates a new instance of <code>ProjectileMain</code>.
      */
     public Main() {
-    	frame = new GameFrame();
+    	frame = new GameFrame(true);
     }
     
     /**
@@ -19,9 +25,25 @@ public class Main {
     public static void main(String[] args) {
        
     	System.setProperty( "sun.java2d.uiScale", "1.0" );
-    	Main main = new Main();
+    	main = new Main();
     		
+    	Timer timer = new Timer(1000/60, main);
+    	timer.setRepeats(true);
+    	timer.start();
         
-    	main.frame.draw();
     }
+    
+    @Override
+	public void actionPerformed(ActionEvent e) {	
+		
+		if(!Keys.getValue(27) && lastEsc){
+			frame.dispose();
+			frame = new GameFrame(!frame.isUndecorated());
+		}
+		
+		lastEsc = Keys.getValue(27);
+		
+		main.frame.draw();
+		
+	}
 }

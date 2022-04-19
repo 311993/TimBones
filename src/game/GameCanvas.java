@@ -98,7 +98,7 @@ public class GameCanvas extends Canvas {
 	    
 	    buffer = new BufferedImage(SIM_WIDTH,SIM_HEIGHT,BufferedImage.TYPE_4BYTE_ABGR);
    		g = buffer.getGraphics();
-   		requestFocusInWindow();
+   		requestFocus();
 	    
 	    try{
 	    	timBones = ImageIO.read(new File("src\\assets\\timBonesHat.png"));
@@ -113,8 +113,8 @@ public class GameCanvas extends Canvas {
 	    	}*/
 	    	
 	    	roomList = parseRooms(roomMap);
-	    	
 	    	currentRoom = roomList.get(1);
+	    	
 	    	
 	    }catch(IOException e){
 	    	e.printStackTrace();
@@ -134,7 +134,6 @@ public class GameCanvas extends Canvas {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
-   		
    		roomWidth = currentRoom.getData()[0].length;
    		roomHeight = currentRoom.getData().length;
 	}
