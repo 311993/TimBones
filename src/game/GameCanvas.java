@@ -112,11 +112,9 @@ public class GameCanvas extends Canvas {
 	    		util.DatManager.imageToDat(ImageIO.read(new File("src\\data\\testLevel" + i +".png")), new File("src\\data\\level" + i +".dat"));
 	    	}*/
 	    	
-	    	//roomList = parseRooms(roomMap);
-	    	roomList = new ArrayList<Room>();
+	    	roomList = parseRooms(roomMap);
+	    	currentRoom = roomList.get(1);
 	    	
-	    	roomList.add(new Room(0, 0, 2, 1, 1));
-	    	currentRoom = roomList.get(0);
 	    	
 	    }catch(IOException e){
 	    	e.printStackTrace();
@@ -136,7 +134,6 @@ public class GameCanvas extends Canvas {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
-   		
    		roomWidth = currentRoom.getData()[0].length;
    		roomHeight = currentRoom.getData().length;
 	}
@@ -173,11 +170,6 @@ public class GameCanvas extends Canvas {
 	//Clear Menu Area
 		g.setColor(Color.BLACK);
 		g.fillRect(0,0,256,64);
-		
-	//Check Doors
-		if(p.x >= roomWidth*8 || p.x <= -16 || p.y >= roomHeight*8 + 64|| p.y <= 64 - 16 ){
-			switchRooms();
-		}
 		
 	//Calculate Screen Scrolling
 		screenX = -8 + 128 - (int)p.x;
@@ -224,6 +216,10 @@ public class GameCanvas extends Canvas {
 		
 	//Update player movement
 		p.update();
+	//Check Doors
+		if(p.x >= roomWidth*8 || p.x <= -16 || p.y >= roomHeight*8 + 64|| p.y <= 64 - 16 ){
+			switchRooms();
+		}
 		
 	}
 	
@@ -305,7 +301,7 @@ public class GameCanvas extends Canvas {
    			roomWidth = currentRoom.getData()[0].length;
    	   		roomHeight = currentRoom.getData().length;
    			
-   			p.x = 1;
+   			p.x = 0;
    	   		p.y += 22*8*(y - currentRoom.getY());
 
    	   		
@@ -374,7 +370,7 @@ public class GameCanvas extends Canvas {
 	                p.x = x + w;
 	            }
 	            
-	            System.out.println("ah");
+	            //System.out.println("ah");
 	        }
 	        
 	    }
