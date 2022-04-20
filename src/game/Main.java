@@ -12,8 +12,7 @@ public class Main  implements ActionListener {
 	public GameFrame frame;
 	private static Main main;    
 	private static boolean lastEsc;
-	public static double deltaMillis;
-	public static double lastMillis;
+	public static double deltaMillis, lastMillis, avgMillis;
 	
     /**
      * Creates a new instance of <code>ProjectileMain</code>.
@@ -42,6 +41,8 @@ public class Main  implements ActionListener {
 		
     	deltaMillis = System.currentTimeMillis() - lastMillis;
     	lastMillis += deltaMillis;
+    	
+    	avgMillis = (avgMillis + deltaMillis)/2;
     	
 		if(!Keys.getValue(27) && lastEsc){
 			frame.dispose();
