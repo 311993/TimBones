@@ -30,6 +30,8 @@ public class Main  implements ActionListener {
     	System.setProperty( "sun.java2d.uiScale", "1.0" );
     	main = new Main();
     		
+    	lastMillis = System.currentTimeMillis();
+    	avgMillis = 0;
     	Timer timer = new Timer(1000/60, main);
     	timer.setRepeats(true);
     	timer.start();
@@ -42,7 +44,11 @@ public class Main  implements ActionListener {
     	deltaMillis = System.currentTimeMillis() - lastMillis;
     	lastMillis += deltaMillis;
     	
-    	avgMillis = (avgMillis + deltaMillis)/2;
+    	if(avgMillis < 0.01) {
+    		avgMillis = deltaMillis;
+    	}else{
+    		avgMillis = (avgMillis*99 + deltaMillis)/100;
+    	}
     	
 		if(!Keys.getValue(27) && lastEsc){
 			frame.dispose();
