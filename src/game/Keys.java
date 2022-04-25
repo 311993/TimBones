@@ -4,7 +4,7 @@ import java.awt.event.KeyListener;
 
 public class Keys implements KeyListener{
 
-	private boolean[] values = new boolean[526];
+	private static boolean[] values = new boolean[526];
 	
 	public Keys() {
 		// TODO Auto-generated constructor stub
@@ -32,7 +32,7 @@ public class Keys implements KeyListener{
 		
 	}
 	
-	public boolean getValue(int i) {
+	public static boolean getValue(int i) {
 		return values[i];
 	}
 
