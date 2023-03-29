@@ -100,10 +100,12 @@ public class GameCanvas extends Canvas {
    		g = buffer.getGraphics();
    		requestFocusInWindow();
 	    
+   		
 	    try{
 	    	timBones = ImageIO.read(new File("src\\assets\\timBonesHat.png"));
 	    	test = ImageIO.read(new File("src\\assets\\black.png"));
 	    	block = ImageIO.read(new File("src\\assets\\graybrick8x8.png"));
+	  
 	    	
 	    	//currentLevelImg = ImageIO.read(new File("src\\data\\testLevel1.png"));
 	    	
