@@ -31,27 +31,27 @@ public class Room{
 		return "Room " + name + " :: "+ width + " x " + height + " room at (" + x + ", " + y + ")";
 	}
 	
-	int[][] getData(){
+	public int[][] getData(){
 		return data;
 	}
 	
-	int getX(){
+	public int getX(){
 		return x;
 	};
 	
-	int getY(){
+	public int getY(){
 		return y;
 	};
 	
-	int getWidth(){
+	public int getWidth(){
 		return width;
 	};
 	
-	int getHeight(){
+	public int getHeight(){
 		return height;
 	};
 	
-	String getName(){
+	public String getName(){
 		return name;
 	};
 }

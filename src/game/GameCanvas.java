@@ -77,7 +77,7 @@ public class GameCanvas extends Canvas {
 	
 	private int ratio;
 	
-	private BufferedImage timBones,test, currentLevelImg, block;
+	private BufferedImage timBones, ladBones, wall, currentLevelImg, block;
 
 	private Player p;
 	
@@ -103,7 +103,8 @@ public class GameCanvas extends Canvas {
    		
 	    try{
 	    	timBones = ImageIO.read(new File("src\\assets\\timBonesHat.png"));
-	    	test = ImageIO.read(new File("src\\assets\\black.png"));
+	    	ladBones = ImageIO.read(new File("src\\assets\\ladBones.png")); 
+	    	wall = ImageIO.read(new File("src\\assets\\black.png"));
 	    	block = ImageIO.read(new File("src\\assets\\graybrick8x8.png"));
 	  
 	    	
@@ -161,18 +162,26 @@ public class GameCanvas extends Canvas {
 						collisionBox(i*8, 64 + j*8, 8, 8, block);
 					break;
 					default:
-						g.drawImage(test, i*8 + screenX, 64 + j*8 + screenY, null);
+						g.drawImage(wall, i*8 + screenX, 64 + j*8 + screenY, null);
 					break;
 				}
 			}
 		}
 		
 	//Draw player
-		g.drawImage(timBones, (int)p.x + screenX, (int)p.y - 8 + screenY, null);	
+		g.drawImage(p.small ? ladBones : timBones, (int)p.x + screenX, (int)p.y - 8 + screenY, null);	
 		
 	//Clear Menu Area
 		g.setColor(Color.BLACK);
 		g.fillRect(0,0,256,64);
+	
+	//Temp
+		for(int i = 0; i < paletteHexReference.length; i++){
+			for(int j = 0; j < paletteHexReference[i].length; j++){
+				g.setColor(new Color(Integer.parseInt(paletteHexReference[i][j], 16)));
+				g.fillRect(8+8*i, 8+8*j, 8, 8);
+			}
+		}
 		
 	//Calculate Screen Scrolling
 		screenX = -8 + 128 - (int)p.x;
@@ -339,6 +348,7 @@ public class GameCanvas extends Canvas {
 		}
 	}
 	
+	//TODO?: change to getColliding(x,y) (in room class??) based on room map + move collision logic to player/entity classes
 	private void collisionBox(int x, int y,int w, int h, BufferedImage img){
 		if(p.x + p.w > x && p.x < x + w && p.y + p.h > y && p.y < y + h){
 	        
