@@ -1,101 +1,80 @@
 package game;
 
-public class Player {
+import java.awt.image.BufferedImage;
+
+public class Player extends Entity{
 	
-	double x = 16;
-    double y = 96;
+    private double spd = 2;
+  
+    private boolean jumpKeyLast = false;
     
-    double v_x = 0;
-    double v_y = 0;
-    
-    double a_x = 0;
-    double a_y = 9.81/20;
-    
-    int w = 16;
-    int h = 24;
-    double spd = 2;
-    
-    double previousX = 200;
-    double previousY = 200;
-    
-    private double terminalVelocity  = 12;
-    private double jumpVelocity = 4.2;
-    
-    int jumps =  2;
-    boolean jumpPrevious = false;
-    int jumpsMax =  2;
-    boolean jumpKeyLast = false;
-    
-    boolean small = false;
+    private boolean small = false;
     private long morphTimestamp = System.currentTimeMillis();
     
     private Keys keys;
     
-	public Player(Keys keys) {
+	public Player(Keys keys, BufferedImage sprite) {
+		super(16, 96, 16, 24, sprite);
 		this.keys = keys;
 	}
 
-    public void update(){
+    public void update(int[][] roomMap){
     	
+    	//Smol Switching
     	if(keys.getValue(16) && System.currentTimeMillis() - morphTimestamp > 500){
-    		small = !small;
-    		jumps = jumpsMax;
+    		
+    		setSmallness(!isSmall());
+    		setJumps(0);
     		morphTimestamp = System.currentTimeMillis();
-    		if(small){
-    			w = 8;
-    			h = 8;
-    			terminalVelocity = 6;
-    			a_y = 9.81/27;
+    		
+    		if(isSmall()){
+    			setSize(8, 8);
+    			setMaxVel(6);
+    			setAccY(9.81/27);
     		}else{
-    			y-=16;
-    			w = 16;
-    			h =24;
-    			terminalVelocity = 12;
-    			a_y = 9.81/20;
+    			setY(getY()-16);
+    			setSize(16, 24);
+    			setMaxVel(12);
+    			setAccY(9.81/20);
     		}
     	}
     	
+    	//move keys
         if(keys.getValue(37)){
-            v_x = -spd;
+            setVelX(-spd);
         }
         
         else if(keys.getValue(39)){
-            v_x = spd;
+            setVelX(spd);
         }
         
         else{
-            v_x = 0;
+            setVelX(0);
         }
         
-        if(keys.getValue(38) && jumps > 0 && !jumpKeyLast){
-            v_y = -jumpVelocity;
-            jumps --;
-            jumpPrevious = true;
+        if(keys.getValue(38) && getJumps() > 0 && !jumpKeyLast){
+            setVelY(-getJumpVel());
+            useJump();
+            setPrevJump(true);
         }
         
-        if(keys.getValue(38) && jumpPrevious){
-            if(v_y < 0){v_y -= 0.24;}
-        }else if(jumpPrevious){
-            jumpPrevious = false;
+        if(keys.getValue(38) && isPrevJump()){
+            if(getVelY() < 0){setVelY(getVelY() - 0.24);}
+        }else if(isPrevJump()){
+            setPrevJump(false);
         }
         
-        previousX = x;
-        previousY = y;
+        super.update(roomMap);
+        
         jumpKeyLast = keys.getValue(38);
         
-        if(Math.abs(v_y) > terminalVelocity){
-        	v_y = Math.signum(v_y)*terminalVelocity;
-        }
-        
-        x += v_x;
-        y += v_y;
-        
-        v_x += a_x;
-        v_y += a_y;
-        
-        if(jumps == jumpsMax && v_y > a_y){
-            jumps--;
-        }
-        
-    };
+    }
+
+	public boolean isSmall() {
+		return small;
+	}
+
+	public void setSmallness(boolean small) {
+		this.small = small;
+	};
 }

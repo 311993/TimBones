@@ -80,6 +80,7 @@ public class GameCanvas extends Canvas {
 	private BufferedImage timBones, ladBones, wall, currentLevelImg, block;
 
 	private Player p;
+	private Entity zom;
 	
 	private int screenX, screenY = 0;
 	private int roomWidth = 32,roomHeight = 22; 
@@ -90,7 +91,9 @@ public class GameCanvas extends Canvas {
 		WIDTH = w;
 		HEIGHT = h;
 		
-		p = new Player(keys);
+		p = new Player(keys, timBones);
+		zom = new Entity(96, 96, 16, 24, timBones);
+		zom.setVelX(0.2);
 		
 		setSize(WIDTH, HEIGHT);
 	    setVisible(true);
@@ -114,6 +117,8 @@ public class GameCanvas extends Canvas {
 	    	/*for(int i = 1; i < 10; i++){
 	    		util.DatManager.imageToDat(ImageIO.read(new File("src\\data\\testLevel" + i +".png")), new File("src\\data\\level" + i +".dat"));
 	    	}*/
+	    	BufferedImage inp = ImageIO.read(new File("C:\\Users\\squir\\Desktop\\Beryl\\assets\\cornerBeach.png"));
+	    	ImageIO.write(util.ImageTools.downscale(inp, 1200/16), "PNG", new File("C:\\Users\\squir\\Desktop\\Beryl\\assets\\cornerBeach2.png"));
 	    	
 	    	roomList = parseRooms(roomMap);
 	    	
@@ -169,7 +174,8 @@ public class GameCanvas extends Canvas {
 		}
 		
 	//Draw player
-		g.drawImage(p.small ? ladBones : timBones, (int)p.x + screenX, (int)p.y - 8 + screenY, null);	
+		g.drawImage(p.isSmall() ? ladBones : timBones, (int)p.getX() + screenX, (int)p.getY() - 8 + screenY, null);	
+		g.drawImage(timBones, (int)zom.getX() + screenX, (int)zom.getY()-8 + screenY, null);
 		
 	//Clear Menu Area
 		g.setColor(Color.BLACK);
@@ -184,7 +190,7 @@ public class GameCanvas extends Canvas {
 		}
 		
 	//Calculate Screen Scrolling
-		screenX = -8 + 128 - (int)p.x;
+		screenX = -8 + 128 - (int)p.getX();
 		
 		if(screenX > 0 ){
 			screenX = 0;
@@ -194,7 +200,7 @@ public class GameCanvas extends Canvas {
 			screenX = (roomWidth)*-8 + 256;
 		}
 		
-		screenY =  64 - 8 + 88 - (int)p.y;
+		screenY =  64 - 8 + 88 - (int)p.getY();
 		
 		if(screenY > 0){
 			screenY = 0;
@@ -205,8 +211,8 @@ public class GameCanvas extends Canvas {
 		}
 		
 	//Determine which section of the current room the player is in
-		segX = (int)p.x/256;
-		segY = (int)p.y/256;
+		segX = (int)p.getX()/256;
+		segY = (int)p.getY()/256;
 		
 		window.setColor(Color.BLACK);
 		window.fillRect(0,0,200,200);
@@ -227,9 +233,10 @@ public class GameCanvas extends Canvas {
 		window.drawRect((WIDTH - SIM_WIDTH*ratio)/2, (HEIGHT - SIM_HEIGHT*ratio)/2, SIM_WIDTH*ratio, SIM_HEIGHT*ratio);
 		
 	//Update player movement
-		p.update();
+		p.update(currentRoom.getData());
+		zom.update(currentRoom.getData());
 	//Check Doors
-		if(p.x >= roomWidth*8 || p.x <= -16 || p.y >= roomHeight*8 + 64|| p.y <= 64 - 16 ){
+		if(p.getX() >= roomWidth*8 || p.getX() <= -16 || p.getY() >= roomHeight*8 + 64|| p.getY() <= 64 - 16 ){
 			switchRooms();
 		}
 		
@@ -242,7 +249,7 @@ public class GameCanvas extends Canvas {
 	 *  	@throws FileNotFoundException when the room data file associated with a room present in roomMap does not exist
 	 *  	@throws NumberFormatException when roomMap contains Strings that are not valid two-digit hexadecimal numbers 
 	 **/
-	private ArrayList<Room> parseRooms(String[][] roomMap){
+	private static ArrayList<Room> parseRooms(String[][] roomMap){
 		ArrayList<Room> output  = new ArrayList<Room>();
 		
 		while(output.size() < 255){ output.add(null); }
@@ -288,106 +295,70 @@ public class GameCanvas extends Canvas {
 		
 		int oldRoomWidth = roomWidth, oldRoomHeight = roomHeight;
 
-   		if(p.x <= -16){
+   		if(p.getX() <= -16){
    			
    			int y = currentRoom.getY() + segY;
-   			p.y -= 22*8*segY;
+   			p.setY(p.getY() - 22*8*segY);
    			
    			currentRoom = roomList.get(Integer.parseInt(roomMap[currentRoom.getY() + segY][currentRoom.getX() -1], 16));
    			
    			roomWidth = currentRoom.getData()[0].length;
    	   		roomHeight = currentRoom.getData().length;
    			
-   	   		p.x = roomWidth*8 - 17;
-   	   		p.y += 22*8*(y - currentRoom.getY());
+   	   		p.setX(roomWidth*8 - 17);
+   	   		p.setY(p.getY() + 22*8*(y - currentRoom.getY()));
    		
    	
    	   		
-   		}else if(p.x >= oldRoomWidth*8){
+   		}else if(p.getX() >= oldRoomWidth*8){
    		   	
    			int y = currentRoom.getY() + segY;
-   			p.y -= 22*8*segY;
+   			p.setY(p.getY() - 22*8*segY);
    			
    			currentRoom = roomList.get(Integer.parseInt(roomMap[currentRoom.getY() + segY][currentRoom.getX() + currentRoom.getWidth()], 16));
    			
    			roomWidth = currentRoom.getData()[0].length;
    	   		roomHeight = currentRoom.getData().length;
    			
-   			p.x = 0;
-   	   		p.y += 22*8*(y - currentRoom.getY());
+   			p.setX(0);
+   	   		p.setY(p.getY() + 22*8*(y - currentRoom.getY()));
 
    	   		
    	   		
 		} 
    		
-   		else if(p.y <=  64 - 16){
+   		else if(p.getY() <=  64 - 16){
    			
    			int x = currentRoom.getX() + segX;
-   			p.x -= 32*8*segX;
+   			p.setX(p.getX() - 32*8*segX);
    			
    			currentRoom = roomList.get(Integer.parseInt(roomMap[currentRoom.getY() - 1][currentRoom.getX() + segX], 16));
    			
    			roomWidth = currentRoom.getData()[0].length;
    	   		roomHeight = currentRoom.getData().length;
    			
-			p.y = roomHeight*8 + 64 - 17;
-			p.x += 32*8*(x - currentRoom.getX());
+			p.setY(roomHeight*8 + 64 - 17);
+			p.setX(p.getX() + 32*8*(x - currentRoom.getX()));
 			
-   		}else if(p.y >= oldRoomHeight*8 + 64){
+   		}else if(p.getY() >= oldRoomHeight*8 + 64){
 			
    			int x = currentRoom.getX() + segX;
-   			p.x -= 32*8*segX;
+   			p.setX(p.getX() - 32*8*segX);
    			
    			currentRoom = roomList.get(Integer.parseInt(roomMap[currentRoom.getY() + currentRoom.getHeight()][currentRoom.getX() + segX], 16));
    			
    			roomWidth = currentRoom.getData()[0].length;
    	   		roomHeight = currentRoom.getData().length;
    			
-   			p.y = 65;
-   			p.x += 32*8*(x - currentRoom.getX());
+   			p.setY(65);
+   			p.setX(p.getX() + 32*8*(x - currentRoom.getX()));
 		}
 	}
 	
-	//TODO?: change to getColliding(x,y) (in room class??) based on room map + move collision logic to player/entity classes
+	//TODO: run collisions based on entity positions rather than for every block
 	private void collisionBox(int x, int y,int w, int h, BufferedImage img){
-		if(p.x + p.w > x && p.x < x + w && p.y + p.h > y && p.y < y + h){
-	        
-	        // Friction
-	        /*if(p.v_x < -0.05){
-	            p.a_x = 0.1;
-	        }else if(p.v_x > 0.05){
-	            p.a_x = -0.1;
-	        }else{
-	            p.a_x = 0;
-	            p.v_x = 0;
-	        }*/
-	        
-	        if(p.previousX + p.w > x && p.previousX < x + w){
-	            p.v_y = 0;
-	            
-	            if(p.previousY <= y){
-	                p.y = y - p.h;
-	                p.jumps = p.jumpsMax;
-	                p.jumpPrevious = false;
-	            }else{
-	                p.y = y + h;
-	            }
-	        }
-	        
-	        if(p.previousY + p.h > y && p.previousY < (y + h)){
-	            p.v_x = 0;
-	            
-	            if(p.previousX <= x){
-	                p.x = x - p.w;
-	            }else{
-	                p.x = x + w;
-	            }
-	            
-	            //System.out.println("ah");
-	        }
-	        
-	    }
-	    
+		p.collision(x,y,w,h);
+		zom.collision(x, y, w, h);
 	    g.drawImage(img, x + screenX, y + screenY,w,h,null);
 	}
 }
