@@ -8,6 +8,7 @@ public class Room{
 	private int x, y, width, height;
 	private String name;
 	private int[][] data;
+	private Entity[] entities;
 	
 	public Room(int x, int y, int width, int height, String name, int levelNum) throws FileNotFoundException{
 		this.x = x;

@@ -5,10 +5,6 @@ import java.awt.image.BufferedImage;
 
 public class ImageTools {
 	
-	public ImageTools() {
-		// TODO Auto-generated constructor stub
-	}
-	
 	public static BufferedImage downscale(BufferedImage original, int factor){
 		BufferedImage output = new BufferedImage(original.getWidth()/factor, original.getHeight()/factor, BufferedImage.TYPE_4BYTE_ABGR);
 				

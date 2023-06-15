@@ -37,9 +37,10 @@ public class GameCanvas extends Canvas {
 		};
 	
 	private static final String[][] roomMap = {
-			{"03","04","04","07",},
+			/*{"03","04","04","07",},
 			{"03","01","01","02",},
-			{"08","05","06","09",},
+			{"08","05","06","09",},*/
+			{"01", "01", "01"}
 	};
 	
 	  /*{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
@@ -77,7 +78,7 @@ public class GameCanvas extends Canvas {
 	
 	private int ratio;
 	
-	private BufferedImage timBones, ladBones, wall, currentLevelImg, block;
+	private BufferedImage timBones, timOverlay, ladBones, wall, currentLevelImg, block;
 
 	private Player p;
 	private Entity zom;
@@ -86,6 +87,10 @@ public class GameCanvas extends Canvas {
 	private int roomWidth = 32,roomHeight = 22; 
 	
 	private int segX, segY;
+
+	private int t = 0;
+
+	private BufferedImage grass;
 	
 	public GameCanvas(int w, int h) {
 		WIDTH = w;
@@ -105,21 +110,24 @@ public class GameCanvas extends Canvas {
 	    
    		
 	    try{
-	    	timBones = ImageIO.read(new File("src\\assets\\timBonesHat.png"));
+	    	timBones = PPU.to2BPP(ImageIO.read(new File("src\\assets\\timBonesGray.png")), 0);
+	    	timOverlay = PPU.to2BPP(ImageIO.read(new File("src\\assets\\timBonesOverlay.png")), 1);
 	    	ladBones = ImageIO.read(new File("src\\assets\\ladBones.png")); 
-	    	wall = ImageIO.read(new File("src\\assets\\black.png"));
-	    	block = ImageIO.read(new File("src\\assets\\graybrick8x8.png"));
+	    	wall = ImageIO.read(new File("src\\assets\\sky.png"));
+	    	block = ImageIO.read(new File("src\\assets\\dirt8x8.png"));
+	    	grass = ImageIO.read(new File("src\\assets\\test.png"));
 	  
 	    	
-	    	//currentLevelImg = ImageIO.read(new File("src\\data\\testLevel1.png"));
+	    	currentLevelImg = ImageIO.read(new File("src\\data\\grassTest.png"));
 	    	
 	    	//import room data from PNGs
 	    	/*for(int i = 1; i < 10; i++){
 	    		util.DatManager.imageToDat(ImageIO.read(new File("src\\data\\testLevel" + i +".png")), new File("src\\data\\level" + i +".dat"));
-	    	}*/
+	    	}
 	    	BufferedImage inp = ImageIO.read(new File("C:\\Users\\squir\\Desktop\\Beryl\\assets\\cornerBeach.png"));
 	    	ImageIO.write(util.ImageTools.downscale(inp, 1200/16), "PNG", new File("C:\\Users\\squir\\Desktop\\Beryl\\assets\\cornerBeach2.png"));
-	    	
+	    	*/
+	    	util.DatManager.imageToDat(ImageIO.read(new File("src\\data\\grassTest.png")), new File("src\\data\\level1.dat"));
 	    	roomList = parseRooms(roomMap);
 	    	
 	    	currentRoom = roomList.get(1);
@@ -166,6 +174,9 @@ public class GameCanvas extends Canvas {
 					case 1:
 						collisionBox(i*8, 64 + j*8, 8, 8, block);
 					break;
+					case 2:
+						collisionBox(i*8, 64 + j*8, 8, 8, grass);
+					break;
 					default:
 						g.drawImage(wall, i*8 + screenX, 64 + j*8 + screenY, null);
 					break;
@@ -174,20 +185,15 @@ public class GameCanvas extends Canvas {
 		}
 		
 	//Draw player
-		g.drawImage(p.isSmall() ? ladBones : timBones, (int)p.getX() + screenX, (int)p.getY() - 8 + screenY, null);	
-		g.drawImage(timBones, (int)zom.getX() + screenX, (int)zom.getY()-8 + screenY, null);
+		g.drawImage(p.isSmall() ? ladBones : timBones, (int)p.getX() + screenX, (int)p.getY() + screenY, null);	
+		if(!p.isSmall()){
+			g.drawImage(timOverlay,(int)p.getX() + screenX, (int)p.getY() - 8 + screenY, null);
+		}
+		g.drawImage(timBones, (int)zom.getX() + screenX, (int)zom.getY() + screenY, null);
 		
 	//Clear Menu Area
 		g.setColor(Color.BLACK);
 		g.fillRect(0,0,256,64);
-	
-	//Temp
-		for(int i = 0; i < paletteHexReference.length; i++){
-			for(int j = 0; j < paletteHexReference[i].length; j++){
-				g.setColor(new Color(Integer.parseInt(paletteHexReference[i][j], 16)));
-				g.fillRect(8+8*i, 8+8*j, 8, 8);
-			}
-		}
 		
 	//Calculate Screen Scrolling
 		screenX = -8 + 128 - (int)p.getX();
@@ -240,6 +246,7 @@ public class GameCanvas extends Canvas {
 			switchRooms();
 		}
 		
+		t ++;
 	}
 	
 	

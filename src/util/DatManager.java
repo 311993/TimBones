@@ -13,7 +13,7 @@ import java.util.Scanner;
 
 public class DatManager {
 
-	private static Color[] key = {Color.BLACK};
+	private static Color[] key = {Color.BLACK, new Color(63, 63, 63)};
 	
 	public DatManager() {
 		// TODO Auto-generated constructor stub
