@@ -2,9 +2,9 @@ package game;
 
 import java.awt.image.BufferedImage;
 
-public class Player extends Entity{
+public class Player extends Creature{
 	
-    private double spd = 2;
+    private double spd = 2; //1->2->3->4
   
     private boolean jumpKeyLast = false;
     
@@ -13,8 +13,10 @@ public class Player extends Entity{
     
     private Keys keys;
     
-	public Player(Keys keys, BufferedImage sprite) {
-		super(16, 96, 16, 24, sprite);
+    private int walkFrame = 0;
+    
+	public Player(Keys keys) {
+		super(32, 96, 16, 24, 0);
 		this.keys = keys;
 	}
 

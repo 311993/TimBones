@@ -2,23 +2,20 @@ package game;
 
 import java.awt.Canvas;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 
 import java.awt.GraphicsConfiguration;
-import java.awt.Image;
 
 public class GameCanvas extends Canvas {
 	
+	private static final long serialVersionUID = -6910426644233784376L;
+
 	private static final String[][] paletteHexReference = {
 			{"5F5F5F", "AFAFAF", "EFEFEF", "FFFFFF"},
 			{"001F97", "0057F7", "279FFF", "AFCFFF"},
@@ -37,35 +34,38 @@ public class GameCanvas extends Canvas {
 		};
 	
 	private static final String[][] roomMap = {
-			/*{"03","04","04","07",},
-			{"03","01","01","02",},
-			{"08","05","06","09",},*/
-			{"01", "01", "01"}
+			//{"03","04","04","07",},
+			//{"03","01","01","02",},
+			//{"08","05","06","09",},
+			{"01"}
 	};
 	
-	  /*{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
-		{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
-		{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
-		{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
-		{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
-		{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
-		{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
-		{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
-		{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
-		{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
-		{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
-		{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
-		{"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
-		{"00","06","07","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
-		{"03","01","01","02","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
-		{"00","04","05","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},*/
+	  /* {"00","00","00","00","00","00","00","07","07","00","00","00","00","00","00","00",},
+	   * {"00","00","00","00","00","00","00","07","07","00","00","00","00","00","00","00",},
+	   * {"00","00","00","00","00","00","00","07","07","00","00","00","00","00","00","00",},
+	   * {"00","00","00","00","00","00","00","06","06","00","00","00","00","00","00","00",},
+	   * {"00","00","00","00","00","00","00","04","04","00","00","00","00","00","00","00",},
+	   * {"00","00","00","00","00","03","03","04","04","00","00","00","00","00","00","00",},
+	   * {"00","00","00","00","00","03","03","04","04","05","05","00","00","00","00","00",},
+	   * {"00","00","00","00","00","02","02","01","01","01","01","00","00","00","00","00",},
+	   * {"00","00","00","00","00","02","02","01","01","01","01","00","00","00","00","00",},
+	   * {"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+	   * {"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+	   * {"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+	   * {"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+	   * {"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+	   * {"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+	   * {"00","00","00","00","00","00","00","00","00","00","00","00","00","00","00","00",},
+	   * */
 	
 	private static Room currentRoom;
 	private static ArrayList<Room> roomList;
 	
 	private static final Color[][] fullPalette = new Color[paletteHexReference.length][paletteHexReference[0].length];
 	
-	public static Keys keys = new Keys();
+	private Keys keys;
+	private PPU ppu;
+	private APU apu; 
 	
 	private BufferedImage buffer = null;
 	private Graphics g;
@@ -74,31 +74,54 @@ public class GameCanvas extends Canvas {
 	private int HEIGHT;
 	
 	private int SIM_WIDTH = 256;
-	private int SIM_HEIGHT = 240;
+	private int SIM_HEIGHT = 224;
 	
 	private int ratio;
 	
-	private BufferedImage timBones, timOverlay, ladBones, wall, currentLevelImg, block;
+	private BufferedImage timBones, timOverlay, ladBones, currentLevelImg, menu;
 
 	private Player p;
-	private Entity zom;
+	//private Creature zom;
 	
 	private int screenX, screenY = 0;
-	private int roomWidth = 32,roomHeight = 22; 
+	private int roomWidth = 16,roomHeight = 11; 
 	
 	private int segX, segY;
 
 	private int t = 0;
 
-	private BufferedImage grass;
+	private BufferedImage block, black, wall, deco, grass;
+	
+	private ArrayList<Creature> monsters;
+	private ArrayList<Projectile> projectiles;
+	private ArrayList<Entity> fgEffects;
+	private ArrayList<Entity> bgEffects;
+	private ArrayList<Item> items;
+
+	private BufferedImage timSheet;
 	
 	public GameCanvas(int w, int h) {
 		WIDTH = w;
 		HEIGHT = h;
 		
-		p = new Player(keys, timBones);
-		zom = new Entity(96, 96, 16, 24, timBones);
-		zom.setVelX(0.2);
+		keys = new Keys();
+		ppu = new PPU(2);
+		apu = new APU();
+		
+		monsters = new ArrayList<Creature>();
+		projectiles = new ArrayList<Projectile>();
+		fgEffects = new ArrayList<Entity>();
+		bgEffects = new ArrayList<Entity>();
+		items = new ArrayList<Item>();
+		
+		p = new Player(keys);
+		
+		monsters.add(p);
+		fgEffects.add(new OverlayEntity(monsters.get(0), 0, -8, 1));
+		fgEffects.get(0).setPalette(1);
+		monsters.add(new Creature(96, 96, 16, 32, 2));
+		monsters.get(1).setPalette(2);
+		monsters.get(1).setVelX(0.2);
 		
 		setSize(WIDTH, HEIGHT);
 	    setVisible(true);
@@ -110,15 +133,18 @@ public class GameCanvas extends Canvas {
 	    
    		
 	    try{
-	    	timBones = PPU.to2BPP(ImageIO.read(new File("src\\assets\\timBonesGray.png")), 0);
-	    	timOverlay = PPU.to2BPP(ImageIO.read(new File("src\\assets\\timBonesOverlay.png")), 1);
+	    	//timBones = ppu.to2BPP(ImageIO.read(new File("src\\assets\\timBonesGray.png")), 0);
+	    	//timOverlay = ppu.to2BPP(ImageIO.read(new File("src\\assets\\timBonesOverlay.png")), 1);
+	    	timSheet = ImageIO.read(new File("src\\assets\\timSheet.png"));
 	    	ladBones = ImageIO.read(new File("src\\assets\\ladBones.png")); 
-	    	wall = ImageIO.read(new File("src\\assets\\sky.png"));
-	    	block = ImageIO.read(new File("src\\assets\\dirt8x8.png"));
-	    	grass = ImageIO.read(new File("src\\assets\\test.png"));
-	  
+	    	black = ImageIO.read(new File("src\\assets\\black.png"));
+	    	wall = ImageIO.read(new File("src\\assets\\backBricks.png"));
+	    	block = ImageIO.read(new File("src\\assets\\brick16x16.png"));
+	    	grass = ImageIO.read(new File("src\\assets\\rug.png"));
+	    	deco = ImageIO.read(new File("src\\assets\\pillarFull.png"));
+	 	    menu = ImageIO.read(new File("src\\assets\\menuLayout.png"));
 	    	
-	    	currentLevelImg = ImageIO.read(new File("src\\data\\grassTest.png"));
+	    	//currentLevelImg = ImageIO.read(new File("src\\data\\grassTest.png"));
 	    	
 	    	//import room data from PNGs
 	    	/*for(int i = 1; i < 10; i++){
@@ -127,8 +153,9 @@ public class GameCanvas extends Canvas {
 	    	BufferedImage inp = ImageIO.read(new File("C:\\Users\\squir\\Desktop\\Beryl\\assets\\cornerBeach.png"));
 	    	ImageIO.write(util.ImageTools.downscale(inp, 1200/16), "PNG", new File("C:\\Users\\squir\\Desktop\\Beryl\\assets\\cornerBeach2.png"));
 	    	*/
-	    	util.DatManager.imageToDat(ImageIO.read(new File("src\\data\\grassTest.png")), new File("src\\data\\level1.dat"));
-	    	roomList = parseRooms(roomMap);
+	    	Color[] key = {Color.BLACK, new Color(63, 63, 63)};
+	    	//util.DatManager.imageToDat(ImageIO.read(new File("src\\data\\grassTest.png")), key);
+	    	roomList = Room.parseRooms(roomMap);
 	    	
 	    	currentRoom = roomList.get(1);
 	    	
@@ -151,8 +178,8 @@ public class GameCanvas extends Canvas {
 			e.printStackTrace();
 		}*/
    		
-   		roomWidth = currentRoom.getData()[0].length;
-   		roomHeight = currentRoom.getData().length;
+   		roomWidth = currentRoom.getTilemap()[0].length;
+   		roomHeight = currentRoom.getTilemap().length;
 	}
 
 	public GameCanvas(GraphicsConfiguration config) {
@@ -160,60 +187,92 @@ public class GameCanvas extends Canvas {
 	}
 	
 	public void paint(Graphics window) {
-		
+	
+	//Clear Menu Area
+	g.clearRect(0, 0, 256, 224);
+	
 	//Draw Tiles
-		int drawMaxX = screenX/-8 + 32;
-			if(drawMaxX > currentRoom.getData()[0].length - 1){drawMaxX = currentRoom.getData()[0].length - 1;}
+		int drawMaxX = screenX/-16 + 16;
+		if(drawMaxX > roomWidth - 1){drawMaxX = roomWidth - 1;}
 		
-		int drawMaxY = screenY/-8 + 22;
-			if(drawMaxY > currentRoom.getData().length - 1){drawMaxY = currentRoom.getData().length - 1;}
+		int drawMaxY = screenY/-16 + 11;
+		if(drawMaxY > roomHeight - 1){drawMaxY = roomHeight - 1;}
 				
-		for(int j = screenY/-8; j <= drawMaxY; j++) {
-			for(int i =  screenX/-8; i <= drawMaxX; i++) {
-				switch(currentRoom.getData()[j][i]){ 
+		for(int j = screenY/-16; j <= drawMaxY; j++) {
+			for(int i =  screenX/-16; i <= drawMaxX; i++) {
+				switch(currentRoom.getTilemap()[j][i]){ 
 					case 1:
-						collisionBox(i*8, 64 + j*8, 8, 8, block);
+						collisionBox(i*16, 48 + j*16, 16, 16);
+						g.drawImage(block, i*16 + screenX, 48 + j*16 + screenY,null);
 					break;
 					case 2:
-						collisionBox(i*8, 64 + j*8, 8, 8, grass);
+						collisionBox(i*16, 48 + j*16 + 8, 16, 8);
+						g.drawImage(grass,i*16 + screenX, 48 + j*16 + screenY, null);
+					break;
+					case 3:
+						g.drawImage(wall,i*16 + screenX, 48 + j*16 + screenY, null);
 					break;
 					default:
-						g.drawImage(wall, i*8 + screenX, 64 + j*8 + screenY, null);
+						g.drawImage(black, i*16 + (int)(screenX), 48 + j*16 + screenY, null);
 					break;
 				}
 			}
 		}
 		
-	//Draw player
+	/*//Draw player
 		g.drawImage(p.isSmall() ? ladBones : timBones, (int)p.getX() + screenX, (int)p.getY() + screenY, null);	
 		if(!p.isSmall()){
 			g.drawImage(timOverlay,(int)p.getX() + screenX, (int)p.getY() - 8 + screenY, null);
 		}
 		g.drawImage(timBones, (int)zom.getX() + screenX, (int)zom.getY() + screenY, null);
+	*/	
+		
+		g.drawImage(deco, 48, 64,null);
+		g.drawImage(deco, 160, 64,null);
+		
+		for(Creature m : monsters){
+			//TODO: after collisions are moved to update(); in creature, update() call can be moved here
+			//if(!m.equals(p)){
+				g.drawImage(ppu.getSprite(m.getSpriteSheetID(), m.getPalette()), (int)m.getX() + screenX, (int)m.getY() + screenY, null);
+			//}
+		}
+						
+		for(Entity e : fgEffects){
+			e.update(currentRoom.getTilemap());
+			g.drawImage(ppu.getSprite(e.getSpriteSheetID(), e.getPalette()), (int)e.getX() + screenX, (int)e.getY() + screenY, null);
+		}
 		
 	//Clear Menu Area
 		g.setColor(Color.BLACK);
-		g.fillRect(0,0,256,64);
+		g.fillRect(0,0,256,48);
+		g.drawImage(menu, 0, 0, null);
+	
+	//Update player movement
+		//p.update(currentRoom.getTilemap());
+		//zom.update(currentRoom.getTilemap());
+		for(Creature m : monsters){
+			m.update(currentRoom.getTilemap());
+		}
 		
 	//Calculate Screen Scrolling
-		screenX = -8 + 128 - (int)p.getX();
+		screenX = -16 + 128 - (int)p.getX();
 		
 		if(screenX > 0 ){
 			screenX = 0;
 		}
 		
-		if(screenX < (roomWidth)*-8 + 256){
-			screenX = (roomWidth)*-8 + 256;
+		if(screenX < (roomWidth)*-16 + 256){
+			screenX = (roomWidth)*-16 + 256;
 		}
 		
-		screenY =  64 - 8 + 88 - (int)p.getY();
+		screenY =  48 - 16 + 88 - (int)p.getY();
 		
 		if(screenY > 0){
 			screenY = 0;
 		}
 		
-		if(screenY < (roomHeight)*-8 + 176){
-			screenY = (roomHeight)*-8 + 176;
+		if(screenY < (roomHeight)*-16 + 176){
+			screenY = (roomHeight)*-16 + 176;
 		}
 		
 	//Determine which section of the current room the player is in
@@ -224,7 +283,12 @@ public class GameCanvas extends Canvas {
 		window.fillRect(0,0,200,200);
 		
 		window.setColor(Color.WHITE);
-		window.drawString(segX +", " + segY, 20,20);
+		window.drawString(p.getVelY() + "", 20,20);
+				
+		//Check Doors
+		if(p.getX() >= roomWidth*16 || p.getX() <= -16 || p.getY() >= roomHeight*16 + 48|| p.getY() <= 48 ){
+			//switchRooms();
+		}
 		
 	//Draw Simulation Onto Canvas
 		if(WIDTH/SIM_WIDTH > HEIGHT/SIM_HEIGHT){
@@ -238,65 +302,8 @@ public class GameCanvas extends Canvas {
 		window.setColor(Color.WHITE);
 		window.drawRect((WIDTH - SIM_WIDTH*ratio)/2, (HEIGHT - SIM_HEIGHT*ratio)/2, SIM_WIDTH*ratio, SIM_HEIGHT*ratio);
 		
-	//Update player movement
-		p.update(currentRoom.getData());
-		zom.update(currentRoom.getData());
-	//Check Doors
-		if(p.getX() >= roomWidth*8 || p.getX() <= -16 || p.getY() >= roomHeight*8 + 64|| p.getY() <= 64 - 16 ){
-			switchRooms();
-		}
-		
 		t ++;
 	}
-	
-	
-	/** Constructs rectangular rooms from a hexadecimal matrix
-	 * 		@param roomMap - a 2D array of two-digit hexadecimal Strings
-	 *  	@return an ArrayList of size 256 of rectangular Rooms
-	 *  	@throws FileNotFoundException when the room data file associated with a room present in roomMap does not exist
-	 *  	@throws NumberFormatException when roomMap contains Strings that are not valid two-digit hexadecimal numbers 
-	 **/
-	private static ArrayList<Room> parseRooms(String[][] roomMap){
-		ArrayList<Room> output  = new ArrayList<Room>();
-		
-		while(output.size() < 255){ output.add(null); }
-		
-		for(int y = 0; y < roomMap.length; y++) {
-			for(int x = 0; x < roomMap[y].length; x++) {
-				
-				String id = roomMap[y][x];
-					
-				if(id.length() <= 2 && !id.equals("00") && Objects.isNull( output.get(Integer.parseInt(id, 16)) ) ){
-					
-					int w = 1,h = 1,xStart = x, yStart = y;
-					
-					while(x + 1 < roomMap[y].length && roomMap[y][x+1].equals(id)){
-						w++;
-						x++;
-					}
-					
-					while(y + 1 < roomMap.length && roomMap[y+1][x].equals(id)){
-						h++;
-						y++;
-					}
-				
-					try {
-						output.set(Integer.parseInt(id, 16), new Room(xStart, yStart, w, h, Integer.parseInt(id, 16)));
-					} catch (NumberFormatException e) {
-						e.printStackTrace();
-					} catch (FileNotFoundException e) {
-						e.printStackTrace();
-					}
-				
-					y = yStart;
-					
-				
-				}
-			}
-		}
-		
-		return output;
-	};
 	
 	private void switchRooms(){
 		
@@ -309,23 +316,23 @@ public class GameCanvas extends Canvas {
    			
    			currentRoom = roomList.get(Integer.parseInt(roomMap[currentRoom.getY() + segY][currentRoom.getX() -1], 16));
    			
-   			roomWidth = currentRoom.getData()[0].length;
-   	   		roomHeight = currentRoom.getData().length;
+   			roomWidth = currentRoom.getTilemap()[0].length;
+   	   		roomHeight = currentRoom.getTilemap().length;
    			
    	   		p.setX(roomWidth*8 - 17);
    	   		p.setY(p.getY() + 22*8*(y - currentRoom.getY()));
    		
    	
    	   		
-   		}else if(p.getX() >= oldRoomWidth*8){
+   		}else if(p.getX() >= oldRoomWidth*16){
    		   	
    			int y = currentRoom.getY() + segY;
    			p.setY(p.getY() - 22*8*segY);
    			
    			currentRoom = roomList.get(Integer.parseInt(roomMap[currentRoom.getY() + segY][currentRoom.getX() + currentRoom.getWidth()], 16));
    			
-   			roomWidth = currentRoom.getData()[0].length;
-   	   		roomHeight = currentRoom.getData().length;
+   			roomWidth = currentRoom.getTilemap()[0].length;
+   	   		roomHeight = currentRoom.getTilemap().length;
    			
    			p.setX(0);
    	   		p.setY(p.getY() + 22*8*(y - currentRoom.getY()));
@@ -334,28 +341,28 @@ public class GameCanvas extends Canvas {
    	   		
 		} 
    		
-   		else if(p.getY() <=  64 - 16){
+   		else if(p.getY() <=  48 - 16){
    			
    			int x = currentRoom.getX() + segX;
    			p.setX(p.getX() - 32*8*segX);
    			
    			currentRoom = roomList.get(Integer.parseInt(roomMap[currentRoom.getY() - 1][currentRoom.getX() + segX], 16));
    			
-   			roomWidth = currentRoom.getData()[0].length;
-   	   		roomHeight = currentRoom.getData().length;
+   			roomWidth = currentRoom.getTilemap()[0].length;
+   	   		roomHeight = currentRoom.getTilemap().length;
    			
-			p.setY(roomHeight*8 + 64 - 17);
+			p.setY(roomHeight*8 + 48 - 17);
 			p.setX(p.getX() + 32*8*(x - currentRoom.getX()));
 			
-   		}else if(p.getY() >= oldRoomHeight*8 + 64){
+   		}else if(p.getY() >= oldRoomHeight*16 + 48){
 			
    			int x = currentRoom.getX() + segX;
    			p.setX(p.getX() - 32*8*segX);
    			
    			currentRoom = roomList.get(Integer.parseInt(roomMap[currentRoom.getY() + currentRoom.getHeight()][currentRoom.getX() + segX], 16));
    			
-   			roomWidth = currentRoom.getData()[0].length;
-   	   		roomHeight = currentRoom.getData().length;
+   			roomWidth = currentRoom.getTilemap()[0].length;
+   	   		roomHeight = currentRoom.getTilemap().length;
    			
    			p.setY(65);
    			p.setX(p.getX() + 32*8*(x - currentRoom.getX()));
@@ -363,9 +370,11 @@ public class GameCanvas extends Canvas {
 	}
 	
 	//TODO: run collisions based on entity positions rather than for every block
-	private void collisionBox(int x, int y,int w, int h, BufferedImage img){
-		p.collision(x,y,w,h);
-		zom.collision(x, y, w, h);
-	    g.drawImage(img, x + screenX, y + screenY,w,h,null);
+	private void collisionBox(int x, int y,int w, int h){
+		//p.collision(x,y,w,h);
+		//zom.collision(x, y, w, h);
+		for(Creature m : monsters){
+			m.collision(x, y, w, h);
+		}
 	}
 }
