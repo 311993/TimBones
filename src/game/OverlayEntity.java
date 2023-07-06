@@ -3,23 +3,27 @@ package game;
 public class OverlayEntity extends Entity {
 	
 	private Entity leader;
-	private int xOffset, yOffset;
 	
-	public OverlayEntity(Entity leader, int xOffset, int yOffset, int id) {
+	public OverlayEntity(Entity leader, int xOffset, int yOffset, int w, int h, int id) {
 		super(leader.getX() + xOffset, leader.getY() + yOffset, 0, 0, id);
-		this.xOffset = xOffset;
-		this.yOffset = yOffset;
+		this.setxOffset(xOffset);
+		this.setyOffset(yOffset);
+		this.setX(leader.getX());
+		this.setY(leader.getY());
+		this.setSize(w, h);
 		this.leader = leader;
 	}
 	
-	public void update(int[][] roomMap){
-		this.setX(leader.getX() + xOffset);
-		this.setY(leader.getY() + yOffset);
-		this.setSize(leader.getW(), leader.getH());
+	public void update(int[][] roomMap, int t){
+		this.setX(leader.getX());
+		this.setY(leader.getY());
 		
 		if(leader.isKillFlagged()){
 			this.kill();
 		}
 	}
-
+	
+	protected Entity getLeader(){
+		return leader;
+	}
 }

@@ -12,7 +12,7 @@ public class Creature extends PhysicsEntity {
 		super(x, y, w, h, id);
 	}
 	
-	public void update(int[][] roomMap){
+	public void update(int[][] roomMap, int t){
 		super.update(roomMap);
 		
 		 if(jumps == jumpsMax && getVelY() > getAccY()){

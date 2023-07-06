@@ -117,11 +117,11 @@ public class GameCanvas extends Canvas {
 		p = new Player(keys);
 		
 		monsters.add(p);
-		fgEffects.add(new OverlayEntity(monsters.get(0), 0, -8, 1));
+		fgEffects.add(new Hat(p, keys));
 		fgEffects.get(0).setPalette(1);
-		monsters.add(new Creature(96, 96, 16, 32, 2));
-		monsters.get(1).setPalette(2);
-		monsters.get(1).setVelX(0.2);
+		//monsters.add(new Creature(96, 96, 16, 32, 0));
+		//monsters.get(1).setPalette(2);
+		//monsters.get(1).setVelX(0.2);
 		
 		setSize(WIDTH, HEIGHT);
 	    setVisible(true);
@@ -233,25 +233,24 @@ public class GameCanvas extends Canvas {
 		for(Creature m : monsters){
 			//TODO: after collisions are moved to update(); in creature, update() call can be moved here
 			//if(!m.equals(p)){
-				g.drawImage(ppu.getSprite(m.getSpriteSheetID(), m.getPalette()), (int)m.getX() + screenX, (int)m.getY() + screenY, null);
+				g.drawImage(ppu.render(m), (int)m.getX() + screenX  + m.getxOffset(), (int)m.getY() + screenY + m.getyOffset(), null);
 			//}
 		}
 						
 		for(Entity e : fgEffects){
-			e.update(currentRoom.getTilemap());
-			g.drawImage(ppu.getSprite(e.getSpriteSheetID(), e.getPalette()), (int)e.getX() + screenX, (int)e.getY() + screenY, null);
+			e.update(currentRoom.getTilemap(), t);
+			g.drawImage(ppu.render(e), (int)e.getX() + screenX + e.getxOffset(), (int)e.getY() + screenY + e.getyOffset(), null);
 		}
 		
 	//Clear Menu Area
 		g.setColor(Color.BLACK);
 		g.fillRect(0,0,256,48);
-		g.drawImage(menu, 0, 0, null);
-	
+		g.drawImage(menu, 0, 0, null);	
 	//Update player movement
 		//p.update(currentRoom.getTilemap());
 		//zom.update(currentRoom.getTilemap());
 		for(Creature m : monsters){
-			m.update(currentRoom.getTilemap());
+			m.update(currentRoom.getTilemap(), t);
 		}
 		
 	//Calculate Screen Scrolling
@@ -283,11 +282,11 @@ public class GameCanvas extends Canvas {
 		window.fillRect(0,0,200,200);
 		
 		window.setColor(Color.WHITE);
-		window.drawString(p.getVelY() + "", 20,20);
-				
+		window.drawString(t%4 + "", 20,20);
+		
 		//Check Doors
 		if(p.getX() >= roomWidth*16 || p.getX() <= -16 || p.getY() >= roomHeight*16 + 48|| p.getY() <= 48 ){
-			//switchRooms();
+			switchRooms();
 		}
 		
 	//Draw Simulation Onto Canvas
@@ -302,7 +301,7 @@ public class GameCanvas extends Canvas {
 		window.setColor(Color.WHITE);
 		window.drawRect((WIDTH - SIM_WIDTH*ratio)/2, (HEIGHT - SIM_HEIGHT*ratio)/2, SIM_WIDTH*ratio, SIM_HEIGHT*ratio);
 		
-		t ++;
+		t++;
 	}
 	
 	private void switchRooms(){
@@ -376,5 +375,9 @@ public class GameCanvas extends Canvas {
 		for(Creature m : monsters){
 			m.collision(x, y, w, h);
 		}
+	}
+
+	public int getT() {
+		return t;
 	}
 }

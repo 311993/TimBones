@@ -30,9 +30,9 @@ public class PPU {
 	};
 	
 	private byte[][] palette3 = {
-			{0,		23,		71,		95},
-			{0,		23,		71,		95},
-			{0,		23,		71,		95}
+			{0,		95, 	-113,	-81,},
+			{0,		95,		-113,	-81,},
+			{0,		95,		-113,	-81,}
 	};
 	
 	private IndexColorModel[] palettes = {
@@ -53,9 +53,7 @@ public class PPU {
 		
 		this.BPP = BPP;
 		try {
-			spriteSheets.add(to2BPP(ImageIO.read(new File("src\\assets\\timBonesGray.png")), 0));
-			spriteSheets.add(to2BPP(ImageIO.read(new File("src\\assets\\timBonesOverlay.png")), 1));
-			spriteSheets.add(to2BPP(ImageIO.read(new File("src\\assets\\armorGray.png")), 2).getSubimage(0, 0, 16, 32));
+			spriteSheets.add(to2BPP(ImageIO.read(new File("src\\assets\\playerSheet.png")), 0));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -88,7 +86,7 @@ public class PPU {
 		
 	}
 	
-	public BufferedImage swapPalette(BufferedImage img, int palette){
+	private BufferedImage swapPalette(BufferedImage img, int palette){
 		return new BufferedImage(palettes[palette], img.getRaster(), false, null);
 	}
 	
@@ -101,7 +99,40 @@ public class PPU {
 		}
 	}
 	
-	public BufferedImage getSprite(int sheet, int palette){
-		return swapPalette(spriteSheets.get(sheet), palette);
+	public BufferedImage render(Entity e){
+		
+		WritableRaster raster = Raster.createWritableRaster(new MultiPixelPackedSampleModel(DataBuffer.TYPE_BYTE,e.getW(), e.getH(), 2), new Point(0,0));
+		BufferedImage output = new BufferedImage(palettes[e.getPalette()], raster, false, null);
+		WritableRaster srcRaster = spriteSheets.get(e.getSpriteSheetID()).copyData(null);
+		
+		for(int j = 0; j < e.getH()/8; j++){
+			for(int i = 0; i < e.getW()/8; i++){
+				
+				int index = j*e.getW()/8 + i;
+				
+				raster = Raster.createWritableRaster(new MultiPixelPackedSampleModel(DataBuffer.TYPE_BYTE,8, 8, 2), new Point(0,0));
+				
+				for(int y = 0; y < raster.getHeight(); y++){
+					for(int x = 0; x < raster.getWidth(); x++){
+						raster.setPixel(x, y, srcRaster.getPixel(8*(e.getSpriteID(index)%16)+x, 8*(e.getSpriteID(index)/16)+y, new int[1]));
+					}
+				}
+				
+				BufferedImage sprite = new BufferedImage(palettes[e.getPalette()], raster, false, null);
+				byte transform = e.getTransform(index);
+				
+				if(transform%4 >= 2){sprite = util.ImageTools.flipHorizontal(sprite);}
+				if((transform%4)%2 > 0){sprite = util.ImageTools.flipVertical(sprite);}
+				
+				for(byte k = 0; k < transform/4; k++){
+					sprite = util.ImageTools.rotateRight(sprite);
+				}
+				
+				
+				output.getGraphics().drawImage(sprite, i*8, j*8, null);
+			}
+		}
+		
+		return output;
 	}
 }
