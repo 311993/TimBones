@@ -12,8 +12,6 @@ import java.util.Scanner;
 /**DatManager provides utility methods to import and manage level data**/
 
 public class DatManager {
-
-	private static Color[] key = {Color.BLACK};
 	
 	public DatManager() {
 		// TODO Auto-generated constructor stub
@@ -24,9 +22,8 @@ public class DatManager {
 	 * Other colors = Background 1
 	 * @param image - the image to source data from
 	 * @return the generated file**/
-	public static File imageToDat(BufferedImage image) throws IOException{
+	public static File imageToDat(BufferedImage image, Color[] key) throws IOException{
 		File dat = null;
-		FileWriter writer = null;
 		int n = 0;
 		
 		do{
@@ -34,38 +31,16 @@ public class DatManager {
 			n++;
 		}while(!dat.createNewFile());
 		
-		writer = new FileWriter(dat);
 		
-		for(int y = 0; y < image.getHeight(); y++){
-			for(int x = 0; x < image.getWidth(); x++){
-			
-					Color c = new Color(image.getRGB(x, y));
-					
-					int desig = 0;
-					
-					for(int i = 0; i < key.length; i++){
-						if(c.equals(key[i])){
-							desig = i + 1;
-							break;
-						}
-					}
-					
-					writer.write(desig + " ");
-			} 
-			writer.write("\n");
-		
-		}
-		
-		writer.close();
+		imageToDat(image, dat, key);
 		return dat;
-		
 	}
 	
 	/**Overwrites an existing level data file with data from an image 
 	 * @param image - the image to source data from
 	 * @param target - the existing file to overwrite
 	 * @see {@link #imageToDat(BufferedImage)}**/
-	public static File imageToDat(BufferedImage image, File target) throws IOException{
+	public static File imageToDat(BufferedImage image, File target, Color[] key) throws IOException{
 		File dat = target;
 		FileWriter writer = new FileWriter(dat);
 		

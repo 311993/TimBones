@@ -4,13 +4,14 @@ import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.util.Arrays;
 
 import javax.swing.JFrame;
 import javax.swing.Timer;
 
 public class GameFrame extends JFrame implements ActionListener {
+	
+	private static final long serialVersionUID = 6400624460959395433L;
+	
 	public static final int WIDTH = (int)Toolkit.getDefaultToolkit().getScreenSize().getWidth();
 	public static final int HEIGHT = (int)Toolkit.getDefaultToolkit().getScreenSize().getHeight();
 	public static GameCanvas canvas;

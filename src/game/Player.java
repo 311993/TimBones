@@ -1,101 +1,190 @@
 package game;
 
-public class Player {
+import java.awt.image.BufferedImage;
+
+public class Player extends Creature{
 	
-	double x = 16;
-    double y = 96;
+    private double spd = 2; //1->2->3->4
+  
+    private boolean jumpKeyLast = false;
     
-    double v_x = 0;
-    double v_y = 0;
-    
-    double a_x = 0;
-    double a_y = 9.81/20;
-    
-    int w = 16;
-    int h = 24;
-    double spd = 2;
-    
-    double previousX = 200;
-    double previousY = 200;
-    
-    private double terminalVelocity  = 12;
-    private double jumpVelocity = 4.2;
-    
-    int jumps =  2;
-    boolean jumpPrevious = false;
-    int jumpsMax =  2;
-    boolean jumpKeyLast = false;
-    
-    boolean small = false;
+    private boolean small = false;
     private long morphTimestamp = System.currentTimeMillis();
     
     private Keys keys;
     
+    private boolean facing = true;
+    
 	public Player(Keys keys) {
+		super(32, 96, 16, 24, 0);
 		this.keys = keys;
+		this.setyOffset(-2);
+		
+		byte[] sprites = {
+			00,01,
+			16,17,
+			32,33,
+		};
+		
+		this.setSpriteIDs(sprites);
 	}
 
-    public void update(){
+    public void update(int[][] roomMap, int t){
     	
+    	//Smol Switching
     	if(keys.getValue(16) && System.currentTimeMillis() - morphTimestamp > 500){
-    		small = !small;
-    		jumps = jumpsMax;
+    		
+    		setSmallness(!isSmall());
+    		setJumps(0);
     		morphTimestamp = System.currentTimeMillis();
-    		if(small){
-    			w = 8;
-    			h = 8;
-    			terminalVelocity = 6;
-    			a_y = 9.81/27;
+    		
+    		if(isSmall()){
+    			setSize(8, 16);
+    			setMaxVel(6);
+    			setAccY(9.81/27);
+    			setyOffset(0);
+    			
+    			if(!facing){
+    				byte[] transforms = {1,1};
+                	this.setTransforms(transforms);
+    			}
+    			
+    			this.setSpriteID(0, (byte)72);
+            	this.setSpriteID(1, (byte)88);
     		}else{
-    			y-=16;
-    			w = 16;
-    			h =24;
-    			terminalVelocity = 12;
-    			a_y = 9.81/20;
+    			setY(getY()-16);
+    			setSize(16, 24);
+    			setMaxVel(12);
+    			setAccY(9.81/20);
+    			setyOffset(-2);
+    			
+    			if(facing){
+    				this.setSpriteID(0, (byte)0);	this.setSpriteID(1, (byte)1);
+        			this.setSpriteID(2, (byte)16);	this.setSpriteID(3, (byte)17);
+        			this.setSpriteID(4, (byte)32);	this.setSpriteID(5, (byte)33);
+    			}else{
+    				byte[] transforms = {1,1,1,1,1,1,};
+   		        	this.setTransforms(transforms);
+    				this.setSpriteID(0, (byte)1);	this.setSpriteID(1, (byte)0);
+            		this.setSpriteID(2, (byte)17);	this.setSpriteID(3, (byte)16);
+            		this.setSpriteID(4, (byte)33);	this.setSpriteID(5, (byte)32);
+    			}
     		}
     	}
     	
+    	//move keys
         if(keys.getValue(37)){
-            v_x = -spd;
+            setVelX(-spd);
+            
+            if(isSmall()){
+               	byte[] transforms = {1,1};
+            	this.setTransforms(transforms);
+            	
+            }else{
+            int frame = (t/4)%4;
+            
+            switch(frame){
+            	case 0:
+            		this.setSpriteID(0, (byte)1);	this.setSpriteID(1, (byte)0);
+            		this.setSpriteID(2, (byte)17);	this.setSpriteID(3, (byte)16);
+            		this.setSpriteID(4, (byte)33);	this.setSpriteID(5, (byte)32);
+            	break;
+            	case 1:
+            		this.setSpriteID(0, (byte)3);	this.setSpriteID(1, (byte)2);
+            		this.setSpriteID(2, (byte)19);	this.setSpriteID(3, (byte)18);
+            		this.setSpriteID(4, (byte)33);	this.setSpriteID(5, (byte)32);
+                break;
+            	case 2:
+            		this.setSpriteID(0, (byte)3);	this.setSpriteID(1, (byte)2);
+            		this.setSpriteID(2, (byte)19);	this.setSpriteID(3, (byte)18);
+            		this.setSpriteID(4, (byte)35);	this.setSpriteID(5, (byte)34);
+                break;
+            	case 3:
+            		this.setSpriteID(0, (byte)1);	this.setSpriteID(1, (byte)0);
+            		this.setSpriteID(2, (byte)17);	this.setSpriteID(3, (byte)16);
+            		this.setSpriteID(4, (byte)35);	this.setSpriteID(5, (byte)34);
+                break;
+            }
+            
+            byte[] transforms = {1,1,1,1,1,1,};
+        	this.setTransforms(transforms);
+        }
+        	facing = false;
+            
         }
         
         else if(keys.getValue(39)){
-            v_x = spd;
+            setVelX(spd);
+            
+            if(isSmall()){
+            	byte[] transforms = {0,0};
+            	this.setTransforms(transforms);
+            	
+            }else{
+            	int frame = (t/4)%4;
+            
+            	switch(frame){
+            		case 0:
+            			this.setSpriteID(0, (byte)0);	this.setSpriteID(1, (byte)1);
+            			this.setSpriteID(2, (byte)16);	this.setSpriteID(3, (byte)17);
+            			this.setSpriteID(4, (byte)32);	this.setSpriteID(5, (byte)33);
+            		break;
+            		case 1:
+            			this.setSpriteID(0, (byte)2);	this.setSpriteID(1, (byte)3);
+            			this.setSpriteID(2, (byte)18);	this.setSpriteID(3, (byte)19);
+            			this.setSpriteID(4, (byte)32);	this.setSpriteID(5, (byte)33);
+            		break;
+            		case 2:
+            			this.setSpriteID(0, (byte)2);	this.setSpriteID(1, (byte)3);
+            			this.setSpriteID(2, (byte)18);	this.setSpriteID(3, (byte)19);
+            			this.setSpriteID(4, (byte)34);	this.setSpriteID(5, (byte)35);
+            		break;
+            		case 3:
+            			this.setSpriteID(0, (byte)0);	this.setSpriteID(1, (byte)1);
+            			this.setSpriteID(2, (byte)16);	this.setSpriteID(3, (byte)17);
+            			this.setSpriteID(4, (byte)34);	this.setSpriteID(5, (byte)35);
+            		break;
+            	}
+            	
+            	byte[] transforms = {0,0,0,0,0,0,};
+            	this.setTransforms(transforms);
+            }
+            	facing = true;
+            
+            
         }
         
         else{
-            v_x = 0;
+            setVelX(0);
         }
         
-        if(keys.getValue(38) && jumps > 0 && !jumpKeyLast){
-            v_y = -jumpVelocity;
-            jumps --;
-            jumpPrevious = true;
+        if(keys.getValue(88) && getJumps() > 0 && !jumpKeyLast){
+            setVelY(-getJumpVel());
+            useJump();
+            setPrevJump(true);
         }
         
-        if(keys.getValue(38) && jumpPrevious){
-            if(v_y < 0){v_y -= 0.24;}
-        }else if(jumpPrevious){
-            jumpPrevious = false;
+        if(keys.getValue(88) && isPrevJump()){
+            if(getVelY() < 0){setVelY(getVelY() - 0.24);}
+        }else if(isPrevJump()){
+            setPrevJump(false);
         }
         
-        previousX = x;
-        previousY = y;
-        jumpKeyLast = keys.getValue(38);
+        super.update(roomMap, t);
         
-        if(Math.abs(v_y) > terminalVelocity){
-        	v_y = Math.signum(v_y)*terminalVelocity;
-        }
+        jumpKeyLast = keys.getValue(88);
         
-        x += v_x;
-        y += v_y;
-        
-        v_x += a_x;
-        v_y += a_y;
-        
-        if(jumps == jumpsMax && v_y > a_y){
-            jumps--;
-        }
-        
-    };
+    }
+
+	public boolean isSmall() {
+		return small;
+	}
+
+	public void setSmallness(boolean small) {
+		this.small = small;
+	};
+	
+	public boolean isFacingEast(){
+		return facing;
+	}
 }
