@@ -232,10 +232,10 @@ public class GameCanvas extends Canvas {
 		for(Creature m : monsters){
 			//TODO: after collisions are moved to update(); in creature, update() call can be moved here
 			//if(!m.equals(p)){
-				g.drawImage(ppu.render(m), (int)m.getX() + screenX  + m.getxOffset(), (int)m.getY() + screenY + m.getyOffset(), null);
+				g.drawImage(ppu.renderEntity(m), (int)m.getX() + screenX  + m.getxOffset(), (int)m.getY() + screenY + m.getyOffset(), null);
 				for(Projectile p : m.getProjectiles()){
 						p.update(currentRoom.getTilemap(), t);
-						g.drawImage(ppu.render(p), (int)p.getX() + screenX  + p.getxOffset(), (int)p.getY() + screenY + p.getyOffset(), null);
+						g.drawImage(ppu.renderEntity(p), (int)p.getX() + screenX  + p.getxOffset(), (int)p.getY() + screenY + p.getyOffset(), null);
 						
 						if(p.getX() + screenX + p.getxOffset() < -p.getW() || p.getX() + screenX + p.getxOffset() >256 || p.getY() + screenY + p.getyOffset() < 48 - p.getH() || p.getY() + screenY + p.getyOffset() >240 ){
 							p.kill();
@@ -246,7 +246,7 @@ public class GameCanvas extends Canvas {
 						
 		for(Entity e : fgEffects){
 			e.update(currentRoom.getTilemap(), t);
-			g.drawImage(ppu.render(e), (int)e.getX() + screenX + e.getxOffset(), (int)e.getY() + screenY + e.getyOffset(), null);
+			g.drawImage(ppu.renderEntity(e), (int)e.getX() + screenX + e.getxOffset(), (int)e.getY() + screenY + e.getyOffset(), null);
 		}
 		
 	//Clear Menu Area

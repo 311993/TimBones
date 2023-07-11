@@ -76,7 +76,7 @@ public class PPU {
     	
 	}
 	
-	public BufferedImage to2BPP(BufferedImage src, int palette){
+	private BufferedImage to2BPP(BufferedImage src, int palette){
 		WritableRaster raster = Raster.createWritableRaster(new MultiPixelPackedSampleModel(DataBuffer.TYPE_BYTE,src.getWidth(), src.getHeight(), 2), new Point(0,0));
 		BufferedImage output = new BufferedImage(palettes[palette], raster, false, null);
 
@@ -100,7 +100,6 @@ public class PPU {
 	
 	private BufferedImage renderSprite(int spriteSheet, int index, int palette){
 		WritableRaster raster = Raster.createWritableRaster(new MultiPixelPackedSampleModel(DataBuffer.TYPE_BYTE,8, 8, 2), new Point(0,0));
-		BufferedImage output = new BufferedImage(palettes[palette], raster, false, null);
 		WritableRaster srcRaster = spriteSheets.get(spriteSheet).copyData(null);
 		
 		raster = Raster.createWritableRaster(new MultiPixelPackedSampleModel(DataBuffer.TYPE_BYTE,8, 8, 2), new Point(0,0));
@@ -117,7 +116,6 @@ public class PPU {
 		text = text.toUpperCase();
 		WritableRaster raster = Raster.createWritableRaster(new MultiPixelPackedSampleModel(DataBuffer.TYPE_BYTE,text.length()*8, 8, 2), new Point(0,0));
 		BufferedImage output = new BufferedImage(palettes[4], raster, false, null);
-		WritableRaster srcRaster = spriteSheets.get(1).copyData(null);
 		
 		for(int i = 0; i < text.length(); i++){
 			
@@ -145,15 +143,7 @@ public class PPU {
 			
 			}
 			
-			raster = Raster.createWritableRaster(new MultiPixelPackedSampleModel(DataBuffer.TYPE_BYTE,8, 8, 2), new Point(0,0));
-					
-			for(int y = 0; y < raster.getHeight(); y++){
-				for(int x = 0; x < raster.getWidth(); x++){
-					raster.setPixel(x, y, srcRaster.getPixel(8*(index%16)+x, 8*(index/16)+y, new int[1]));
-				}
-			}
-				
-			BufferedImage sprite = new BufferedImage(palettes[4], raster, false, null);
+			BufferedImage sprite = renderSprite(1, index, 4);
 						
 			output.getGraphics().drawImage(sprite, i*8, 0, null);
 		}
@@ -183,26 +173,17 @@ public class PPU {
 		return output;
 	}
 	
-	public BufferedImage render(Entity e){
+	public BufferedImage renderEntity(Entity e){
 		
 		WritableRaster raster = Raster.createWritableRaster(new MultiPixelPackedSampleModel(DataBuffer.TYPE_BYTE,e.getW(), e.getH(), 2), new Point(0,0));
 		BufferedImage output = new BufferedImage(palettes[e.getPalette()], raster, false, null);
-		WritableRaster srcRaster = spriteSheets.get(e.getSpriteSheetID()).copyData(null);
 		
 		for(int j = 0; j < e.getH()/8; j++){
 			for(int i = 0; i < e.getW()/8; i++){
 				
 				int index = j*e.getW()/8 + i;
-				
-				raster = Raster.createWritableRaster(new MultiPixelPackedSampleModel(DataBuffer.TYPE_BYTE,8, 8, 2), new Point(0,0));
-				
-				for(int y = 0; y < raster.getHeight(); y++){
-					for(int x = 0; x < raster.getWidth(); x++){
-						raster.setPixel(x, y, srcRaster.getPixel(8*(e.getSpriteID(index)%16)+x, 8*(e.getSpriteID(index)/16)+y, new int[1]));
-					}
-				}
-				
-				BufferedImage sprite = new BufferedImage(palettes[e.getPalette()], raster, false, null);
+								
+				BufferedImage sprite = renderSprite(e.getSpriteSheetID(), e.getSpriteID(index), e.getPalette());
 				byte transform = e.getTransform(index);
 				
 				if(transform%4 >= 2){sprite = util.ImageTools.flipHorizontal(sprite);}
@@ -211,13 +192,16 @@ public class PPU {
 				for(byte k = 0; k < transform/4; k++){
 					sprite = util.ImageTools.rotateRight(sprite);
 				}
-				
-				
+								
 				output.getGraphics().drawImage(sprite, i*8, j*8, null);
 			}
 		}
 		
 		return output;
+	} 
+	
+	public BufferedImage renderTile(int index, int palette){
+		return renderSprite(2, index, palette);
 	}
 	
 	public BufferedImage renderMenu(Player p){
@@ -282,7 +266,7 @@ public class PPU {
 		g.drawImage(renderBox(3,3),96,8,null);
 		g.drawImage(renderBox(9,3),136,8,null);
 		g.drawImage(renderText("ITEMS", 0), 88, 32, null);
-		g.drawImage(renderText("COURTYD.", 0), 144, 32, null);
+		g.drawImage(renderText("TOWER W.", 0), 144, 32, null);
 		
 		//Castle Map
 		g.drawImage(renderSprite(1,64,4),216, 8, null);

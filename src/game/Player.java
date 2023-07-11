@@ -185,16 +185,14 @@ public class Player extends Creature{
         		byte[] sprites2 = {(byte)8, (byte)8, 71, 71};
         		p.setStraightSprites(sprites2);
         		byte[] transforms = {3,0,3,0};
-        		if(facing){p.setVelX(0);}else{p.setVelX(0);}
-        		//p.setAccY(9.81/27);
-        		//p.setVelY(-6);
+        		if(facing){p.setVelX(4);}else{p.setVelX(-4);}
         		p.setTransforms(transforms);
         		p.setDiagTransforms(transforms);
         		byte[] transforms2 = {6,4,0,0};
         		p.setStraightTransforms(transforms2);
         		getProjectiles().add(p);
         		
-        		RotatingProjectile p2 = new RotatingProjectile(getX(), getY() - 24, 16, 16, facing, 0);
+        		RotatingProjectile p2 = new RotatingProjectile(getX(), getY(), 16, 16, facing, 0);
         		p2.setPalette(1);
         		byte[] sprites3 = {(byte)9, (byte)10, (byte)11, (byte)12,};
         		p2.setSpriteIDs(sprites3);
@@ -202,11 +200,13 @@ public class Player extends Creature{
         		byte[] sprites4 = {(byte)13, (byte)14, 71, 71};
         		p2.setStraightSprites(sprites4);
         		byte[] transforms3 = {0,0,0,0};
-        		if(facing){p2.setVelX(0);}else{p2.setVelX(0);}
+        		if(facing){p2.setVelX(2);}else{p2.setVelX(-2);}
         		p2.setTransforms(transforms3);
         		p2.setDiagTransforms(transforms3);
         		byte[] transforms4 = {0,0,0,0};
         		p2.setStraightTransforms(transforms4);
+        		p2.setAccY(9.81/27);
+        		p2.setVelY(-6);
         		getProjectiles().add(p2);
         	}
         }
