@@ -142,7 +142,6 @@ public class GameCanvas extends Canvas {
 	    	block = ImageIO.read(new File("src\\assets\\brick16x16.png"));
 	    	grass = ImageIO.read(new File("src\\assets\\rug.png"));
 	    	deco = ImageIO.read(new File("src\\assets\\pillarFull.png"));
-	 	    menu = ImageIO.read(new File("src\\assets\\menuLayout.png"));
 	    	
 	    	//currentLevelImg = ImageIO.read(new File("src\\data\\grassTest.png"));
 	    	
@@ -234,6 +233,14 @@ public class GameCanvas extends Canvas {
 			//TODO: after collisions are moved to update(); in creature, update() call can be moved here
 			//if(!m.equals(p)){
 				g.drawImage(ppu.render(m), (int)m.getX() + screenX  + m.getxOffset(), (int)m.getY() + screenY + m.getyOffset(), null);
+				for(Projectile p : m.getProjectiles()){
+						p.update(currentRoom.getTilemap(), t);
+						g.drawImage(ppu.render(p), (int)p.getX() + screenX  + p.getxOffset(), (int)p.getY() + screenY + p.getyOffset(), null);
+						
+						if(p.getX() + screenX + p.getxOffset() < -p.getW() || p.getX() + screenX + p.getxOffset() >256 || p.getY() + screenY + p.getyOffset() < 48 - p.getH() || p.getY() + screenY + p.getyOffset() >240 ){
+							p.kill();
+						}
+				}
 			//}
 		}
 						
@@ -245,7 +252,7 @@ public class GameCanvas extends Canvas {
 	//Clear Menu Area
 		g.setColor(Color.BLACK);
 		g.fillRect(0,0,256,48);
-		g.drawImage(menu, 0, 0, null);	
+		g.drawImage(ppu.renderMenu(p), 0, 0, null);	
 	//Update player movement
 		//p.update(currentRoom.getTilemap());
 		//zom.update(currentRoom.getTilemap());

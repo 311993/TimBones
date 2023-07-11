@@ -13,6 +13,8 @@ public class Room{
 	private String name;
 	private int[][] tilemap;
 	private Entity[] entities;
+	private boolean bossRoom;
+	private boolean itemGet;
 	
 	public Room(int x, int y, int width, int height, String name, int levelNum) throws FileNotFoundException{
 		this.x = x;

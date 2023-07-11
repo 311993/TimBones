@@ -1,23 +1,33 @@
 package game;
 
+import java.util.ArrayList;
+
 public class Creature extends PhysicsEntity {
 	
     private double jumpVel = 4.2;
-    
     private int jumps = 1;
     private boolean prevJump = false;
     private int jumpsMax = 1;
+    private int health, maxHealth;
+    private ArrayList<Projectile> projectiles = new ArrayList<Projectile>();
 	
 	public Creature(double x, double y, int w, int h, int id) {
 		super(x, y, w, h, id);
 	}
 	
 	public void update(int[][] roomMap, int t){
-		super.update(roomMap);
+		super.update(roomMap, t);
 		
 		 if(jumps == jumpsMax && getVelY() > getAccY()){
 	            jumps--;
 	     }
+		 
+		 for(int  i = 0; i < projectiles.size(); i++){
+			 if(projectiles.get(i).isKillFlagged()){
+				 projectiles.remove(i);
+				 i--;
+			 }
+		 }
 	}
 	
 	public void collision(int x2, int y2,int w2, int h2){
@@ -82,5 +92,25 @@ public class Creature extends PhysicsEntity {
 
 	public void setPrevJump(boolean prevJump) {
 		this.prevJump = prevJump;
+	}
+
+	public ArrayList<Projectile> getProjectiles() {
+		return projectiles;
+	}
+
+	public int getHealth() {
+		return health;
+	}
+
+	public void setHealth(int health) {
+		this.health = health;
+	}
+
+	public int getMaxHealth() {
+		return maxHealth;
+	}
+
+	public void setMaxHealth(int maxHealth) {
+		this.maxHealth = maxHealth;
 	}
 }

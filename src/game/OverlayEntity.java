@@ -21,6 +21,8 @@ public class OverlayEntity extends Entity {
 		if(leader.isKillFlagged()){
 			this.kill();
 		}
+		
+		super.update(roomMap, t);
 	}
 	
 	protected Entity getLeader(){

@@ -86,7 +86,7 @@ public class Entity {	//TODO: should this be an abstract class?
 		return spriteIDs;
 	}
 	
-	public int getSpriteID(int index) {
+	public byte getSpriteID(int index) {
 		return this.spriteIDs[index];
 	}
 

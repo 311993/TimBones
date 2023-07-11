@@ -1,7 +1,5 @@
 package game;
 
-import java.awt.image.BufferedImage;
-
 public class Player extends Creature{
 	
     private double spd = 2; //1->2->3->4
@@ -11,6 +9,8 @@ public class Player extends Creature{
     private boolean small = false;
     private long morphTimestamp = System.currentTimeMillis();
     
+    private int maxMP, MP;
+    
     private Keys keys;
     
     private boolean facing = true;
@@ -18,6 +18,10 @@ public class Player extends Creature{
 	public Player(Keys keys) {
 		super(32, 96, 16, 24, 0);
 		this.keys = keys;
+		this.setMaxHealth(15);
+		this.setHealth(15);
+		this.setMaxMP(15);
+		this.setMP(15);
 		this.setyOffset(-2);
 		
 		byte[] sprites = {
@@ -162,12 +166,49 @@ public class Player extends Creature{
             setVelY(-getJumpVel());
             useJump();
             setPrevJump(true);
+            this.setMP(getMP()-1);
         }
         
         if(keys.getValue(88) && isPrevJump()){
             if(getVelY() < 0){setVelY(getVelY() - 0.24);}
         }else if(isPrevJump()){
             setPrevJump(false);
+        }
+        
+        if(keys.getValue(90)){
+        	if(getProjectiles().size() == 0){
+        		RotatingProjectile p = new RotatingProjectile(getX(), getY(), 16, 16, facing, 0);
+        		p.setPalette(0);
+        		byte[] sprites = {(byte)7, (byte)6, (byte)6, (byte)7,};
+        		p.setSpriteIDs(sprites);
+        		p.setDiagSprites(sprites);
+        		byte[] sprites2 = {(byte)8, (byte)8, 71, 71};
+        		p.setStraightSprites(sprites2);
+        		byte[] transforms = {3,0,3,0};
+        		if(facing){p.setVelX(0);}else{p.setVelX(0);}
+        		//p.setAccY(9.81/27);
+        		//p.setVelY(-6);
+        		p.setTransforms(transforms);
+        		p.setDiagTransforms(transforms);
+        		byte[] transforms2 = {6,4,0,0};
+        		p.setStraightTransforms(transforms2);
+        		getProjectiles().add(p);
+        		
+        		RotatingProjectile p2 = new RotatingProjectile(getX(), getY() - 24, 16, 16, facing, 0);
+        		p2.setPalette(1);
+        		byte[] sprites3 = {(byte)9, (byte)10, (byte)11, (byte)12,};
+        		p2.setSpriteIDs(sprites3);
+        		p2.setDiagSprites(sprites3);
+        		byte[] sprites4 = {(byte)13, (byte)14, 71, 71};
+        		p2.setStraightSprites(sprites4);
+        		byte[] transforms3 = {0,0,0,0};
+        		if(facing){p2.setVelX(0);}else{p2.setVelX(0);}
+        		p2.setTransforms(transforms3);
+        		p2.setDiagTransforms(transforms3);
+        		byte[] transforms4 = {0,0,0,0};
+        		p2.setStraightTransforms(transforms4);
+        		getProjectiles().add(p2);
+        	}
         }
         
         super.update(roomMap, t);
@@ -186,5 +227,21 @@ public class Player extends Creature{
 	
 	public boolean isFacingEast(){
 		return facing;
+	}
+
+	public int getMaxMP() {
+		return maxMP;
+	}
+
+	public void setMaxMP(int mp) {
+		this.maxMP = mp;
+	}
+
+	public int getMP() {
+		return MP;
+	}
+
+	public void setMP(int orgone) {
+		this.MP = orgone;
 	}
 }

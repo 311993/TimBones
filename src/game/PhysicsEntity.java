@@ -19,7 +19,7 @@ public class PhysicsEntity extends Entity {
 		prevY = y;
 	}
 	
-	public void update(int[][] roomMap){
+	public void update(int[][] roomMap, int t){
 	    	
 	   	prevX = getX();
 	    prevY = getY();
@@ -33,6 +33,8 @@ public class PhysicsEntity extends Entity {
 	        
 	    velX += accX;
 	    velY += accY;
+	    
+	    super.update(roomMap, t);
 	    }
 	    
 	    public boolean isColliding(int x2, int y2,int w2, int h2){
