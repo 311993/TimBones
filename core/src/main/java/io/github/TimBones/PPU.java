@@ -3,6 +3,7 @@ package io.github.TimBones;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -39,6 +40,8 @@ public class PPU {
     private final int u_palette;
     private final int u_attributeTable;
     private final int u_spritePal;
+    private final int u_hScroll;
+    private final int u_vScroll;
 
     /**Private constructor to prevent instantiation.*/
     private PPU(){
@@ -51,7 +54,7 @@ public class PPU {
         spriteSheet = null;
 
         palette = new float[96];
-        attributeTable = new int[15]; //actual NES attribute table is TL-TR-BL-BR per byte; each int in this array is attribute table for one row
+        attributeTable = new int[17]; //actual NES attribute table is TL-TR-BL-BR per byte; each int in this array is attribute table for one col
 
         OAM = new int[64];
         OAMindex = 0;
@@ -69,6 +72,8 @@ public class PPU {
         tileShader.bind();
         u_attributeTable = tileShader.getUniformLocation("attributeTable[0]");
         u_palette = tileShader.getUniformLocation("palette[0]");
+        u_hScroll = tileShader.getUniformLocation("hScroll");
+        u_vScroll = tileShader.getUniformLocation("vScroll");
 
         spriteShader.bind();
         u_spritePal = spriteShader.getUniformLocation("spritePal[0]");
@@ -123,11 +128,11 @@ public class PPU {
     }
 
     /**
-     * Set tile attribute table. Each int in the array represents the palette attributes for one 256x16 pixel row, with the highest 2 bits representing the first 16x16 metatile, etc.
-     * The array must have length 15.
+     * Set tile attribute table. Each int in the array represents the palette attributes for one 256x16 pixel column, with the highest 2 bits representing the first 16x16 metatile, etc.
+     * The array must have length 17.
      * */
     public void setAttributeTable(int[] attributeTable){
-        assert attributeTable.length == 15 : "Parameter attributeTable must have length 15.";
+        assert attributeTable.length == 17 : "Parameter attributeTable must have length 17.";
         this.attributeTable = attributeTable;
     }
 
@@ -183,20 +188,20 @@ public class PPU {
     }
 
     /**Render tiles from byte array and sprites from OAM to viewport.
-     * tiles byte array should be of length 960 (32*30) and hold tile sheet indices of tiles to be rendered.*/
-    public void render(Viewport viewport, byte[] tiles){
+     * tiles byte array should be of length 1023 (33*31) and hold tile sheet indices of tiles to be rendered.*/
+    public void render(Viewport viewport, byte[] tiles, int hScroll, int vScroll){
 
         ScreenUtils.clear(0f, 0f, 0f, 1f);
         viewport.apply();
 
-        renderTiles(viewport, tiles);
+        renderTiles(viewport, tiles, hScroll, vScroll);
 
         renderSprites(viewport);
 
     }
 
     /**Render tiles to viewport.*/
-    private void renderTiles(Viewport viewport, byte[] tiles) {
+    private void renderTiles(Viewport viewport, byte[] tiles, int hScroll, int vScroll) {
 
         //Set up rendering
         tileBatch.setProjectionMatrix(viewport.getCamera().combined);
@@ -205,20 +210,26 @@ public class PPU {
 
         //Send uniforms
         tileShader.setUniform3fv(u_palette, palette, 0, palette.length);
+        tileShader.setUniformi(u_hScroll, hScroll);
+        tileShader.setUniformi(u_vScroll, vScroll);
 
-        for(int i = 0; i < 15; i++) {
+
+        for(int i = 0; i < 17; i++) {
             tileShader.setUniformi(u_attributeTable + i, attributeTable[i]);
         }
 
+        vScroll %= 8;
+        hScroll %= 8;
+
         //Draw tiles
-        for(byte j = 0; j < 30; j++){
-            for(byte i = 0; i < 32; i++){
+        for(byte j = 0; j < 31; j++){
+            for(byte i = 0; i < 33; i++){
 
                 int id = tiles[32*j + i];
                 int mask = (id >> 31);
                 id = ((id ^ mask) - mask);
 
-                tileBatch.draw(tileSheet, i*8f, j*8f, 8f, 8f, (id % 16)*8, (id / 16)*8, 8, 8, false, false);
+                tileBatch.draw(tileSheet, i*8f + hScroll - 8, 232 - j*8f - vScroll + 8, 8f, 8f, (id % 16)*8, (id / 16)*8, 8, 8, false, false);
             }
         }
 
@@ -230,7 +241,6 @@ public class PPU {
         //Set up rendering
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
         spriteBatch.begin();
-        spriteBatch.disableBlending();
 
         //Draw until OAM empty
         while(OAMindex > 0){
@@ -254,7 +264,7 @@ public class PPU {
                     ((id >> 1) & 0x0F) * 8,
                     (id >> 5) * 8,
                     8, 16,
-                    (spriteData & 0x10000000) > 0, (spriteData & 0x08000000) > 0
+                    (spriteData & 0x08000000) > 0, (spriteData & 0x10000000) > 0
                 );
             }
         }

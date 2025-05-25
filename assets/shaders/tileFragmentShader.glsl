@@ -4,16 +4,18 @@ in vec2 vPos;
 
 uniform sampler2D u_texture;
 uniform vec3 palette[32];
-uniform int attributeTable[15];
+uniform int attributeTable[17];
+uniform int hScroll;
+uniform int vScroll;
 
 void main() {
     int index = int(texture2D(u_texture, vCoord).r * 255.0);
-    int x = int(vPos[0]) >> 4;
+    int y = (int(vPos[1] + vScroll) >> 4);
     int attr = ((
-        //y pos
-        attributeTable[int(vPos[1]) >> 4]
         //x pos
-        & (3 << (2*x))) >> (2*x));
+        attributeTable[(int(vPos[0] + 16 - hScroll) >> 4) ]
+        //y pos
+        & (3 << (2*y))) >> (2*y));
 
     //fix sign bit messing with right shift
     if(attr < 0){
