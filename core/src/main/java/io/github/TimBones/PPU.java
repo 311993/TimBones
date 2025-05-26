@@ -127,6 +127,8 @@ public class PPU {
         spriteBatch.dispose();
     }
 
+    //TODO? change attribute table + tiles (2D) to read offset by modulus
+
     /**
      * Set tile attribute table. Each int in the array represents the palette attributes for one 256x16 pixel column, with the highest 2 bits representing the first 16x16 metatile, etc.
      * The array must have length 17.
@@ -174,6 +176,18 @@ public class PPU {
         }
     }
 
+    /**Render tiles from byte array and sprites from OAM to viewport.
+     * tiles byte array should 32 x 34 and hold tile sheet indices of tiles to be rendered.*/
+    public void render(Viewport viewport, byte[][] tiles, int hScroll, int vScroll, int hOffset, int vOffset){
+
+        ScreenUtils.clear(0f, 0f, 0f, 1f);
+        viewport.apply();
+
+        renderTiles(viewport, tiles, hScroll, vScroll, hOffset, vOffset);
+
+        renderSprites(viewport);
+    }
+
     /**
      * Add sprite data to OAM if there is room left. Return number of sprites written, which is 64 if full.
      * spriteData should be of the form: 000 | flipV | flipH | invisible | palette (2) | ID (8) | X Pos (8) | Y Pos (8).
@@ -187,21 +201,8 @@ public class PPU {
         return OAMindex;
     }
 
-    /**Render tiles from byte array and sprites from OAM to viewport.
-     * tiles byte array should be of length 1023 (33*31) and hold tile sheet indices of tiles to be rendered.*/
-    public void render(Viewport viewport, byte[] tiles, int hScroll, int vScroll){
-
-        ScreenUtils.clear(0f, 0f, 0f, 1f);
-        viewport.apply();
-
-        renderTiles(viewport, tiles, hScroll, vScroll);
-
-        renderSprites(viewport);
-
-    }
-
     /**Render tiles to viewport.*/
-    private void renderTiles(Viewport viewport, byte[] tiles, int hScroll, int vScroll) {
+    private void renderTiles(Viewport viewport, byte[][] tiles, int hScroll, int vScroll, int hOffset, int vOffset) {
 
         //Set up rendering
         tileBatch.setProjectionMatrix(viewport.getCamera().combined);
@@ -222,12 +223,23 @@ public class PPU {
         hScroll %= 8;
 
         //Draw tiles
-        for(byte j = 0; j < 31; j++){
-            for(byte i = 0; i < 33; i++){
+        for(int j = 0; j < 32; j++){
+            for(int i = 0; i < 34; i++){
 
-                int id = tiles[32*j + i];
-                int mask = (id >> 31);
-                id = ((id ^ mask) - mask);
+                //Get tile id
+                int yCoord = (j + vOffset) % 32;
+                yCoord += (yCoord >= 0) ? 0 : 32;
+
+                int xCoord = (i + hOffset) % 34;
+                xCoord += (xCoord >= 0) ? 0 : 34;
+
+//                vOffset %= 32;
+//                hOffset %= 34;
+//                vOffset += (vOffset >= 0) ? 0 : 32;
+//                hOffset += (hOffset >= 0) ? 0 : 34;
+
+                int id = tiles[yCoord][xCoord];
+                id = (id >= 0) ? id : id + 256;
 
                 tileBatch.draw(tileSheet, i*8f + hScroll - 8, 232 - j*8f - vScroll + 8, 8f, 8f, (id % 16)*8, (id / 16)*8, 8, 8, false, false);
             }
@@ -251,7 +263,7 @@ public class PPU {
             //Draw only if visible
             if((spriteData & 0x04000000) == 0) {
                 //Send palette uniform
-                spriteShader.setUniform3fv(u_spritePal, palette, 12 * ((spriteData & 0x03000000) >> 24), 12);
+                spriteShader.setUniform3fv(u_spritePal, palette, 48 + 12 * ((spriteData & 0x03000000) >> 24), 12);
 
                 //Decode spriteData + draw
                 int id = (spriteData & 0xFF0000) >> 16;

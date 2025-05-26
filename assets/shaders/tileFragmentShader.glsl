@@ -13,7 +13,7 @@ void main() {
     int y = (int(vPos[1] + vScroll) >> 4);
     int attr = ((
         //x pos
-        attributeTable[(int(vPos[0] + 16 - hScroll) >> 4) ]
+        attributeTable[(int(vPos[0] + 16 - hScroll) >> 4) % 17]
         //y pos
         & (3 << (2*y))) >> (2*y));
 
