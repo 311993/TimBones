@@ -2,6 +2,7 @@ package io.github.TimBones;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.Arrays;
@@ -22,7 +23,7 @@ public class Main extends ApplicationAdapter {
 
         ppu = PPU.getReference();
 
-        ppu.loadSheets(Gdx.files.internal("tileSheetTestBit.png"), Gdx.files.internal("palBox.bmp"));
+        ppu.loadSheets(new Texture("tileSheetTestBit.png"), new Texture("palBox.bmp"));
 
         int[] pals = {0x0F000102, 0x101112, 0x202122, 0x303132, 0x040506, 0x141516, 0x242526, 0x343536};
         ppu.setPalettes(pals);
@@ -39,11 +40,16 @@ public class Main extends ApplicationAdapter {
                 tiles[j][i] = (byte)(j * 16 + i % 16);
             }
         }
+
+        GameSettings settings = GameSettings.getReference();
+        GameSettings.getSettingsFromJSON();
+        GameSettings.sendSettingsToJSON();
+        Keys keys = new Keys();
     }
 
     @Override
     public void render() {
-        ppu.sendToOAM(0x11000000);
+        ppu.sendToOAM(0x01010000 + (2*(240 - t %256) %256) << 8);
         //Integer[] attrTable = {0, 0b11100100111001001110010011100100, 0b11100100111001001110010011100100, 0b11100100111001001110010011100100, 0b11100100111001001110010011100100, 0b11100100111001001110010011100100, 0b11100100111001001110010011100100, 0b11100100111001001110010011100100, 0b11100100111001001110010011100100, 0b11100100111001001110010011100100, 0b11100100111001001110010011100100, 0b11100100111001001110010011100100, 0b11100100111001001110010011100100, 0b11100100111001001110010011100100, 0b11100100111001001110010011100100, 0b11100100111001001110010011100100, 0b11100100111001001110010011100100,};
         Integer[] attrTable = {0xFFFFFFFF,0x00000000, 0x00000000,0x00000000,0x00000000, 0x00000000, 0x00000000,0x00000000,0x00000000, 0x00000000, 0x00000000,0x00000000,0x00000000, 0x00000000, 0x00000000,0x00000000,0x00000000,};//0x55555555, 0xAAAAAAAA, 0xFFFFFFFF, 0x00000000, 0x55555555, 0xAAAAAAAA, 0xFFFFFFFF, 0x00000000, 0x55555555, 0xAAAAAAAA, 0xFFFFFFFF, 0x00000000, 0x55555555, 0xAAAAAAAA, 0xFFFFFFFF,};
         Collections.rotate(Arrays.asList(attrTable), t / 16);
@@ -52,7 +58,7 @@ public class Main extends ApplicationAdapter {
             newAttrTable[i] = Integer.rotateRight(attrTable[i], 2*(t / 16));
         }
         ppu.setAttributeTable(newAttrTable);
-        ppu.render(viewport, this.tiles, t % 16,t % 16, -t / 8, -t / 8);
+        ppu.render(viewport, this.tiles, t % 16,t % 16, 8, 32);
         t--;
     }
 

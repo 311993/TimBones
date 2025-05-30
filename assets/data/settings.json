@@ -1,0 +1,30 @@
+{
+keyNames: [
+	"left",
+	"right",
+	"up",
+	"down",
+	"a",
+	"b",
+	"start",
+	"select"
+],
+keys: {
+	a: [ 88 ],
+	b: [ 90 ],
+	select: [ 16 ],
+	left: [ 37, 100, 65 ],
+	start: [ 13 ],
+	right: [ 39, 102, 68 ],
+	up: [ 38, 104, 87 ],
+	down: [ 40, 98, 83 ]
+},
+volume: 0,
+fullscreen: true,
+zoom: -1,
+gamma: 1,
+colorblind: 0,
+iframes: 15,
+gamespeed: 1,
+health: 1
+}

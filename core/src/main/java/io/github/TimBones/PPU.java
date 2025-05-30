@@ -3,7 +3,6 @@ package io.github.TimBones;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -77,42 +76,27 @@ public class PPU {
 
         spriteShader.bind();
         u_spritePal = spriteShader.getUniformLocation("spritePal[0]");
-    };
+    }
 
     /**Return reference to PPU singleton instance.*/
     public static PPU getReference(){
         return ppu;
     }
 
-    /**Load tile + sprite sheets. Must successfully set both sheets before calling render().
-     * Return value is 0 if successful, |'ed with1 if tile sheet not found, |'ed with 2 if sprite sheet not found.*/
-    public int loadSheets(FileHandle tileSheetFile, FileHandle spriteSheetFile){
+    /**Load tile + sprite sheets. Must set both sheets before calling render().*/
+    public void loadSheets(Texture tileSheet, Texture spriteSheet){
+        assert tileSheet != null;
+        assert spriteSheet != null;
 
-        int exitCode = 0;
-
-        //Load tile sheet
-        if(tileSheetFile.exists()){
-            if(tileSheet != null){
-                tileSheet.dispose();
-            }
-
-            tileSheet = new Texture(tileSheetFile);
-        }else{
-            exitCode += 1;
+        if(this.tileSheet != null){
+            this.tileSheet.dispose();
         }
+       this.tileSheet = tileSheet;
 
-        //Load sprite sheet
-        if(spriteSheetFile.exists()){
-            if(spriteSheet != null){
-                spriteSheet.dispose();
-            }
-
-            spriteSheet = new Texture(spriteSheetFile);
-        }else{
-            exitCode += 2;
+        if(this.spriteSheet != null){
+            this.spriteSheet.dispose();
         }
-
-        return exitCode;
+        this.spriteSheet = spriteSheet;
     }
 
     /** Releases all resources of this object. */
@@ -126,8 +110,6 @@ public class PPU {
         tileBatch.dispose();
         spriteBatch.dispose();
     }
-
-    //TODO? change attribute table + tiles (2D) to read offset by modulus
 
     /**
      * Set tile attribute table. Each int in the array represents the palette attributes for one 256x16 pixel column, with the highest 2 bits representing the first 16x16 metatile, etc.
@@ -178,12 +160,12 @@ public class PPU {
 
     /**Render tiles from byte array and sprites from OAM to viewport.
      * tiles byte array should 32 x 34 and hold tile sheet indices of tiles to be rendered.*/
-    public void render(Viewport viewport, byte[][] tiles, int hScroll, int vScroll, int hOffset, int vOffset){
+    public void render(Viewport viewport, byte[][] tiles, int hScroll, int vScroll, int startScroll, int endScroll){
 
         ScreenUtils.clear(0f, 0f, 0f, 1f);
         viewport.apply();
 
-        renderTiles(viewport, tiles, hScroll, vScroll, hOffset, vOffset);
+        renderTiles(viewport, tiles, hScroll, vScroll, startScroll, endScroll);
 
         renderSprites(viewport);
     }
@@ -202,7 +184,7 @@ public class PPU {
     }
 
     /**Render tiles to viewport.*/
-    private void renderTiles(Viewport viewport, byte[][] tiles, int hScroll, int vScroll, int hOffset, int vOffset) {
+    private void renderTiles(Viewport viewport, byte[][] tiles, int hScroll, int vScroll, int startScroll, int endScroll) {
 
         //Set up rendering
         tileBatch.setProjectionMatrix(viewport.getCamera().combined);
@@ -211,9 +193,6 @@ public class PPU {
 
         //Send uniforms
         tileShader.setUniform3fv(u_palette, palette, 0, palette.length);
-        tileShader.setUniformi(u_hScroll, hScroll);
-        tileShader.setUniformi(u_vScroll, vScroll);
-
 
         for(int i = 0; i < 17; i++) {
             tileShader.setUniformi(u_attributeTable + i, attributeTable[i]);
@@ -223,25 +202,34 @@ public class PPU {
         hScroll %= 8;
 
         //Draw tiles
+        int row_hScroll;
+        int row_vScroll;
         for(int j = 0; j < 32; j++){
+
+            if(j >= startScroll && j <= endScroll) {
+                row_hScroll = hScroll;
+                row_vScroll = vScroll;
+            }else{
+                row_hScroll = 0;
+                row_vScroll = 0;
+            }
+
+            tileShader.setUniformi(u_hScroll, row_hScroll);
+            tileShader.setUniformi(u_vScroll, row_vScroll);
+
             for(int i = 0; i < 34; i++){
 
                 //Get tile id
-                int yCoord = (j + vOffset) % 32;
-                yCoord += (yCoord >= 0) ? 0 : 32;
+//                int yCoord = (j + vOffset) % 32;
+//                yCoord += (yCoord >= 0) ? 0 : 32;
+//
+//                int xCoord = (i + hOffset) % 34;
+//                xCoord += (xCoord >= 0) ? 0 : 34;
 
-                int xCoord = (i + hOffset) % 34;
-                xCoord += (xCoord >= 0) ? 0 : 34;
-
-//                vOffset %= 32;
-//                hOffset %= 34;
-//                vOffset += (vOffset >= 0) ? 0 : 32;
-//                hOffset += (hOffset >= 0) ? 0 : 34;
-
-                int id = tiles[yCoord][xCoord];
+                int id = tiles[j][i];
                 id = (id >= 0) ? id : id + 256;
 
-                tileBatch.draw(tileSheet, i*8f + hScroll - 8, 232 - j*8f - vScroll + 8, 8f, 8f, (id % 16)*8, (id / 16)*8, 8, 8, false, false);
+                tileBatch.draw(tileSheet, i*8f + row_hScroll - 8, 232 - j*8f - row_vScroll + 8, 8f, 8f, (id % 16)*8, (id / 16)*8, 8, 8, false, false);
             }
         }
 
