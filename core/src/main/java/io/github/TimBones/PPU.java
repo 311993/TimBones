@@ -158,18 +158,6 @@ public class PPU {
         }
     }
 
-    /**Render tiles from byte array and sprites from OAM to viewport.
-     * tiles byte array should 32 x 34 and hold tile sheet indices of tiles to be rendered.*/
-    public void render(Viewport viewport, byte[][] tiles, int hScroll, int vScroll, int startScroll, int endScroll){
-
-        ScreenUtils.clear(0f, 0f, 0f, 1f);
-        viewport.apply();
-
-        renderTiles(viewport, tiles, hScroll, vScroll, startScroll, endScroll);
-
-        renderSprites(viewport);
-    }
-
     /**
      * Add sprite data to OAM if there is room left. Return number of sprites written, which is 64 if full.
      * spriteData should be of the form: 000 | flipV | flipH | invisible | palette (2) | ID (8) | X Pos (8) | Y Pos (8).
@@ -183,8 +171,20 @@ public class PPU {
         return OAMindex;
     }
 
+    /**Render tiles from byte array and sprites from OAM to viewport.
+     * tiles byte array should 32 x 34 and hold tile sheet indices of tiles to be rendered.*/
+    public void render(Viewport viewport, byte[][] tiles, int hScroll, int vScroll, int startScroll, int endScroll){
+
+        ScreenUtils.clear(0f, 0f, 0f, 1f);
+        viewport.apply();
+
+        renderTiles(viewport, tiles, hScroll, vScroll, startScroll, endScroll, true);
+        renderSprites(viewport);
+        renderTiles(viewport, tiles, 0, 0, startScroll, endScroll, false);
+    }
+
     /**Render tiles to viewport.*/
-    private void renderTiles(Viewport viewport, byte[][] tiles, int hScroll, int vScroll, int startScroll, int endScroll) {
+    private void renderTiles(Viewport viewport, byte[][] tiles, int hScroll, int vScroll, int startScroll, int endScroll, boolean scrollSection) {
 
         //Set up rendering
         tileBatch.setProjectionMatrix(viewport.getCamera().combined);
@@ -202,34 +202,21 @@ public class PPU {
         hScroll %= 8;
 
         //Draw tiles
-        int row_hScroll;
-        int row_vScroll;
-        for(int j = 0; j < 32; j++){
+        for(int j = 2; j < 30; j++){
 
-            if(j >= startScroll && j <= endScroll) {
-                row_hScroll = hScroll;
-                row_vScroll = vScroll;
-            }else{
-                row_hScroll = 0;
-                row_vScroll = 0;
+            if((j >= startScroll && j <= endScroll) != scrollSection) {
+                continue;
             }
 
-            tileShader.setUniformi(u_hScroll, row_hScroll);
-            tileShader.setUniformi(u_vScroll, row_vScroll);
+            tileShader.setUniformi(u_hScroll, hScroll);
+            tileShader.setUniformi(u_vScroll, vScroll);
 
             for(int i = 0; i < 34; i++){
-
-                //Get tile id
-//                int yCoord = (j + vOffset) % 32;
-//                yCoord += (yCoord >= 0) ? 0 : 32;
-//
-//                int xCoord = (i + hOffset) % 34;
-//                xCoord += (xCoord >= 0) ? 0 : 34;
 
                 int id = tiles[j][i];
                 id = (id >= 0) ? id : id + 256;
 
-                tileBatch.draw(tileSheet, i*8f + row_hScroll - 8, 232 - j*8f - row_vScroll + 8, 8f, 8f, (id % 16)*8, (id / 16)*8, 8, 8, false, false);
+                tileBatch.draw(tileSheet, i*8f + hScroll - 8, 232 - j*8f - vScroll + 8, 8f, 8f, (id % 16)*8, (id / 16)*8, 8, 8, false, false);
             }
         }
 
@@ -255,11 +242,10 @@ public class PPU {
 
                 //Decode spriteData + draw
                 int id = (spriteData & 0xFF0000) >> 16;
-
                 spriteBatch.draw(
                     (id & 1) == 0 ? spriteSheet : tileSheet,
                     (spriteData & 0xFF00) >> 8,
-                    spriteData & 0xFF,
+                    240 - (spriteData & 0xFF),
                     8, 16,
                     ((id >> 1) & 0x0F) * 8,
                     (id >> 5) * 8,

@@ -64,8 +64,6 @@ public class GameSettings implements Json.Serializable{
         Json json = new Json();
         GameSettings settings = json.fromJson(GameSettings.class, Gdx.files.internal("data/settings.json"));
 
-        System.out.println(settings.volume);
-
         //Always have arrow keys do movement
         for(int i = 0; i < 8; i++) {
             if(!settings.keys.get(keyNames[i]).contains(defaultKeys[i])) {

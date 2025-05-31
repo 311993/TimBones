@@ -33,13 +33,17 @@ public class Keys extends InputAdapter {
 
     @Override
     public boolean keyDown(int keycode) {
-       state[bindings.get(keycode)] = true;
+        if(bindings.containsKey(keycode)){
+            state[bindings.get(keycode)] = true;
+        }
         return false;
     }
 
     @Override
     public boolean keyUp(int keycode) {
-        state[bindings.get(keycode)] = false;
+        if(bindings.containsKey(keycode)){
+            state[bindings.get(keycode)] = false;
+        }
         return false;
     }
 
